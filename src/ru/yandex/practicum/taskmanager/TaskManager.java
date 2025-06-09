@@ -1,6 +1,5 @@
 package ru.yandex.practicum.taskmanager;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -10,7 +9,7 @@ public class TaskManager {
     private HashMap<Integer, Task> simpleTasks = new HashMap<>();
     private HashMap<Integer, Epic> epics = new HashMap<>();
     private HashMap<Integer, Subtask> subtasks = new HashMap<>();
-    private HashMap<Integer, ArrayList<Integer>> epicSubtaskMapping = new HashMap<>(); //для хранения связей между эпиком и его подзадачами
+    private HashMap<Integer, ArrayList<Integer>> epicSubtaskMapping = new HashMap<>(); //связь эпиков с подзадачами
 
     public HashMap<Integer, Task> getSimpleTasks() {
         return simpleTasks;
@@ -28,7 +27,7 @@ public class TaskManager {
         return epicSubtaskMapping;
     }
 
-    int getTaskId() {
+    int generateTaskId() {
         return ++taskId;
     }
 
@@ -62,10 +61,15 @@ public class TaskManager {
                 break;
             case SUBTASK:
                 Subtask subtask = (Subtask)task;
-
                 subtasks.put(subtask.getId(), subtask);
+                Epic epic = epics.get(subtask.getEpicId());
+                if (epic.getStatus() == TaskStatus.DONE) {
+                    Epic newEpic = new Epic(epic.getName(), epic.getDescription(), epic.getId(), TaskStatus.NEW);
+                    updateTask(newEpic);
+                }
                 epicSubtaskMapping.computeIfAbsent(subtask.getEpicId(), k ->
                         new ArrayList<>()).add(subtask.getId());
+
                 break;
         }
     }
@@ -77,9 +81,10 @@ public class TaskManager {
         epics = new HashMap<>();
     }
 
-    HashMap<Integer, Subtask> getEpicSubtasks (int epicId) {
-        HashMap<Integer, Subtask>  epicSubtasks = new HashMap<>();
-        epicSubtaskMapping.get(epicId).forEach(subtaskId -> epicSubtasks.put(subtaskId, subtasks.get(subtaskId)));
+    //удалить метод, функционал перенести в связанный метод
+    ArrayList<Subtask> getEpicSubtasks (int epicId) {
+        ArrayList<Subtask>  epicSubtasks = new ArrayList<>();
+        epicSubtaskMapping.get(epicId).forEach(subtaskId -> epicSubtasks.add(subtasks.get(subtaskId)));
         return epicSubtasks;
     }
 
@@ -91,17 +96,36 @@ public class TaskManager {
             epics.put(task.getId(), (Epic)task);
         } else if ("Subtask".equals(taskType)) {
             Subtask subtask = (Subtask)task;
-            HashMap<Integer, Subtask> epicSubtasks = getEpicSubtasks(subtask.getEpicId());
-            if(subtask.getStatus() == subtasks.get(subtask.getId()).getStatus()) {
-                subtasks.put(subtask.getId(), subtask);
-            } else {
-                TaskStatus status = subtask.getStatus();
-                ArrayList<TaskStatus> epicSubtasksStatuses = new ArrayList<>();
-                epicSubtasks.forEach((k, v) -> epicSubtasksStatuses.add(v.getStatus()));
+            subtasks.put(subtask.getId(), subtask);
+            TaskStatus currentEpicStatus = epics.get(subtask.getEpicId()).getStatus();
+            TaskStatus calculatedEpicStatus = defineEpicStatus(subtask.getEpicId());
 
+            if (currentEpicStatus != calculatedEpicStatus) {
+                Epic epic = epics.get(subtask.getEpicId());
+                Epic newEpic = new Epic(epic.getName(), epic.getDescription(), epic.getId(), calculatedEpicStatus);
+                epics.put(newEpic.getId(), newEpic);
             }
-
         }
+    }
+
+    TaskStatus defineEpicStatus (int epicId) {
+        ArrayList<Subtask> epicSubtasks = getEpicSubtasks(epicId);
+        boolean isNew = true;
+        boolean isDone = true;
+        for (Subtask subtask : epicSubtasks) {
+            isNew = isNew && (subtask.getStatus() == TaskStatus.NEW); //?все в статусе NEW
+            isDone = isDone && (subtask.getStatus() == TaskStatus.DONE); //?все в статусе DONE
+        }
+        if (isNew) {
+            return TaskStatus.NEW;
+        } else if (isDone) {
+            return TaskStatus.DONE;
+        }
+        return TaskStatus.IN_PROGRESS;
+    }
+
+    void deleteTaskById (int taskId) {
+
     }
 
 }

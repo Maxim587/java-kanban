@@ -3,10 +3,10 @@ package ru.yandex.practicum.taskmanager;
 import java.util.Objects;
 
 public class Task {
-    private String name;
-    private String description;
+    private final String name;
+    private final String description;
     private final int id;
-    private TaskStatus status;
+    private final TaskStatus status;
 
     Task(String name, String description, int id, TaskStatus status) {
         this.name = name;
@@ -27,13 +27,14 @@ public class Task {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+//    public void setDescription(String description) {
+//        this.description = description;
+//    }
 
     public TaskStatus getStatus() {
         return status;
     }
+
 
     @Override
     public boolean equals(Object o) {
