@@ -65,14 +65,23 @@ public class Main {
     }
 
     static void addTaskRoutine() {
-        HashMap<String, String> taskAttributes = fillTaskAttributes();
-        if (taskAttributes == null) {
+        System.out.println("Укажите тип задачи. Для возврата в главное меню нажмите Enter");
+        String taskType = fillTaskType();
+        if (taskType == null) {
             return;
         }
 
-        String taskType = taskAttributes.get("taskType");
-        String taskName = taskAttributes.get("taskName");
-        String taskDescription = taskAttributes.get("taskDescription");
+        System.out.print("Введите имя задачи (Enter - для выхода): ");
+        String taskName = fillTaskName();
+        if (taskName == null) {
+            return;
+        }
+
+        System.out.print("Введите описание задачи (Enter - для выхода): ");
+        String taskDescription = fillTaskDescription();
+        if (taskDescription == null) {
+            return;
+        }
 
         if (taskType.equals(TaskType.TASK.name())) {
             taskManager.addTask(new Task(taskName, taskDescription, taskManager.getTaskId(),
@@ -110,7 +119,7 @@ public class Main {
         }
     }
 
-    static boolean isCorrectIdNumber(String number) {
+    static boolean isCorrectNumber(String number) {
         String positiveNumberRegex = "\\d+";
         int maxNumberOfDigitsInInt = Integer.toString(Integer.MAX_VALUE).length();
         return number.matches(positiveNumberRegex) &&
@@ -120,14 +129,10 @@ public class Main {
 
     static boolean checkEpicIdNumber (String epicIdStr) {
         return epicIdStr.equals("0") ||
-                (isCorrectIdNumber(epicIdStr) && taskManager.checkEpicId(Integer.parseInt(epicIdStr)));
+                (isCorrectNumber(epicIdStr) && taskManager.checkEpicId(Integer.parseInt(epicIdStr)));
     }
 
-    //заполнение атрибутов задачи
-    static HashMap<String, String> fillTaskAttributes() {
-        HashMap<String, String> taskAttributes = new HashMap<>();
-
-        System.out.println("Укажите тип задачи. Для возврата в главное меню нажмите Enter");
+    static String fillTaskType() {
         int counter = 1;
         for (TaskType type : TaskType.values()) {
             System.out.println(counter + " - " + type);
@@ -148,8 +153,8 @@ public class Main {
                 taskType = "EPIC";
                 break;
             case "3":
-                if (!taskManager.checkActiveEpics()) {
-                    System.out.println("Отсутствуют активные эпики. Нужно создать эпик для добавления подзадачи");
+                if (taskManager.epicsIsEmpty()) {
+                    System.out.println("Отсутствуют эпики. Нужно создать эпик для добавления подзадачи");
                     return null;
                 }
                 taskType = "SUBTASK";
@@ -158,24 +163,47 @@ public class Main {
                 System.out.println("Неправильно указан тип задачи");
                 return null;
         }
+        return taskType;
+    }
 
-        taskAttributes.put("taskType", taskType);
-
-        System.out.print("Введите имя задачи (Enter - для выхода): ");
+    static String fillTaskName() {
         String taskName = scanner.nextLine();
         if (taskName.isEmpty()) {
             return null;
         }
-        taskAttributes.put("taskName", taskName);
+        return taskName;
+    }
 
-        System.out.print("Введите описание задачи (Enter - для выхода): ");
+    static String fillTaskDescription() {
         String taskDescription = scanner.nextLine();
         if (taskDescription.isEmpty()) {
             return null;
         }
-        taskAttributes.put("taskDescription", taskDescription);
+        return taskDescription;
+    }
 
-        return taskAttributes;
+    static TaskStatus fillTaskStatus() {
+        TaskStatus[] taskStatuses = TaskStatus.values();
+        String command = "-";
+        while (!(command.isEmpty() || isCorrectNumber(command))) {
+            for (int i = 0; i < taskStatuses.length; i++) {
+                System.out.println((i + 1) + " - " + taskStatuses[i]);
+            }
+            command = scanner.nextLine();
+        }
+        if (command.isEmpty()) {
+            return null;
+        }
+
+        int statusNumber = Integer.parseInt(command);
+
+        for (int i = 0; i < taskStatuses.length; i++) {
+            if (i == (statusNumber - 1)) {
+                return taskStatuses[i];
+            }
+        }
+        System.out.println("Введено некорректное значение");
+        return null;
     }
 
     static void printTaskList() {
@@ -200,9 +228,9 @@ public class Main {
 
     static Task getTask() {
         String idStr = "";
-        while(!(isCorrectIdNumber(idStr))) {
+        while(!(isCorrectNumber(idStr))) {
             printTaskList();
-            System.out.print("Введите номер задачи (0 - для выхода):");
+            System.out.print("Введите номер задачи (0 - для выхода): ");
             idStr = scanner.nextLine();
         }
         if(idStr.equals("0")) {
@@ -230,8 +258,45 @@ public class Main {
             return;
         }
 
-        System.out.println("Введите новые атрибуты задачи");
-        task.setDescription("Новое описание");
+        String taskType = task.getClass().getSimpleName();
+
+        System.out.println("Заполните атрибуты задачи, которые хотите обновить");
+        System.out.print("Введите новое имя задачи (Enter - пропустить): ");
+        String taskName = fillTaskName();
+        if (taskName == null) {
+            taskName = task.getName();
+        }
+
+        System.out.print("Введите новое описание задачи (Enter - пропустить): ");
+        String taskDescription = fillTaskDescription();
+        if (taskDescription == null) {
+            taskDescription = task.getDescription();
+        }
+
+        TaskStatus taskStatus = task.getStatus();
+        if (!"Epic".equals(taskType)) {
+            System.out.println("Введите новый статус задачи (Enter - пропустить): ");
+            TaskStatus newStatus = fillTaskStatus();
+            if (newStatus != null) {
+                taskStatus = newStatus;
+            }
+        }
+
+        switch(taskType) {
+            case "Task":
+                Task updatedTask = new Task(taskName, taskDescription, task.getId(), taskStatus);
+                break;
+            case "Epic":
+                Epic updatedEpic = new Epic(taskName, taskDescription, task.getId(), taskStatus);
+                break;
+            case "Subtask":
+                Subtask updatedSubtask = new Subtask(taskName, taskDescription, task.getId(),
+                        taskStatus, ((Subtask)task).getEpicId());
+                break;
+            default:
+                return;
+        }
+
 
     }
 }

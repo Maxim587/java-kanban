@@ -1,5 +1,6 @@
 package ru.yandex.practicum.taskmanager;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -31,13 +32,8 @@ public class TaskManager {
         return ++taskId;
     }
 
-    boolean checkActiveEpics() {
-        for(Epic epic : epics.values()) {
-            if (epic.getStatus() != TaskStatus.DONE) {
-                return true;
-            }
-        }
-        return false;
+    boolean epicsIsEmpty() {
+        return epics.isEmpty();
     }
 
     Task getTaskById(int id) {
@@ -66,6 +62,7 @@ public class TaskManager {
                 break;
             case SUBTASK:
                 Subtask subtask = (Subtask)task;
+
                 subtasks.put(subtask.getId(), subtask);
                 epicSubtaskMapping.computeIfAbsent(subtask.getEpicId(), k ->
                         new ArrayList<>()).add(subtask.getId());
@@ -80,9 +77,30 @@ public class TaskManager {
         epics = new HashMap<>();
     }
 
+    HashMap<Integer, Subtask> getEpicSubtasks (int epicId) {
+        HashMap<Integer, Subtask>  epicSubtasks = new HashMap<>();
+        epicSubtaskMapping.get(epicId).forEach(subtaskId -> epicSubtasks.put(subtaskId, subtasks.get(subtaskId)));
+        return epicSubtasks;
+    }
+
     void updateTask(Task task) {
-        if("Task".equals(task.getClass().getSimpleName())) {
+        String taskType = task.getClass().getSimpleName();
+        if ("Task".equals(taskType)) {
             simpleTasks.put(task.getId(), task);
+        } else if ("Epic".equals(taskType)) {
+            epics.put(task.getId(), (Epic)task);
+        } else if ("Subtask".equals(taskType)) {
+            Subtask subtask = (Subtask)task;
+            HashMap<Integer, Subtask> epicSubtasks = getEpicSubtasks(subtask.getEpicId());
+            if(subtask.getStatus() == subtasks.get(subtask.getId()).getStatus()) {
+                subtasks.put(subtask.getId(), subtask);
+            } else {
+                TaskStatus status = subtask.getStatus();
+                ArrayList<TaskStatus> epicSubtasksStatuses = new ArrayList<>();
+                epicSubtasks.forEach((k, v) -> epicSubtasksStatuses.add(v.getStatus()));
+
+            }
+
         }
     }
 
