@@ -15,13 +15,13 @@ public class Subtask extends Task {
     @Override
     public String toString() {
 
-        return "Subtask{" +
-                "id=" + super.getId() +
+        return "Task{" +
+                "type=" + super.getTaskType() +
+                ", id=" + super.getId() +
                 ", name='" + super.getName() + '\'' +
                 ", description='" + super.getDescription() + '\'' +
                 ", status=" + super.getStatus() +
                 ", epicId=" + epicId +
-                ", type=" + super.getTaskType() +
                 '}';
     }
 }

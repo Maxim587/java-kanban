@@ -12,8 +12,6 @@ public class Main {
         taskManager = new TaskManager();
         scanner = new Scanner(System.in);
 
-        TestingData.createTestEntities(taskManager);
-
         while (true) {
             printMenu();
             String command = scanner.nextLine();
@@ -89,7 +87,7 @@ public class Main {
                 System.out.println("Задача " + taskName + " добавлена");
                 break;
             case EPIC:
-                taskManager.addTask(new Epic(taskManager.generateTaskId(), taskName, taskDescription,
+                taskManager.addEpic(new Epic(taskManager.generateTaskId(), taskName, taskDescription,
                         TaskStatus.NEW, TaskType.EPIC));
                 System.out.println("Эпик " + taskName + " добавлен");
                 break;
@@ -106,7 +104,7 @@ public class Main {
                 int epicId = Integer.parseInt(epicIdStr);
                 int subtaskId = taskManager.generateTaskId();
 
-                taskManager.addTask(new Subtask(subtaskId, taskName, taskDescription,
+                taskManager.addSubtask(new Subtask(subtaskId, taskName, taskDescription,
                         TaskStatus.NEW, epicId, TaskType.SUBTASK));
                 System.out.println("Подзадача " + taskName + " добавлена в эпик " +
                         taskManager.getEpicById(epicId).getName());
@@ -272,10 +270,6 @@ public class Main {
     }
 
     static void updateTask() {
-        if (taskManager.tasksIsEmpty() && taskManager.epicsIsEmpty()) {
-            System.out.println("Список задач пуст");
-            return;
-        }
         Task task = getTaskById();
         if (task == null) {
             return;
@@ -311,12 +305,12 @@ public class Main {
                 break;
             case EPIC:
                 Epic updatedEpic = new Epic(task.getId(), taskName, taskDescription, taskStatus, TaskType.EPIC);
-                taskManager.updateTask(updatedEpic);
+                taskManager.updateEpic(updatedEpic);
                 break;
             case SUBTASK:
                 Subtask updatedSubtask = new Subtask(task.getId(), taskName, taskDescription,
                         taskStatus, ((Subtask) task).getEpicId(), TaskType.SUBTASK);
-                taskManager.updateTask(updatedSubtask);
+                taskManager.updateSubtask(updatedSubtask);
                 break;
         }
     }
@@ -326,9 +320,21 @@ public class Main {
         if (task == null) {
             return;
         }
+
         TaskType taskType = task.getTaskType();
         int taskId = task.getId();
-        taskManager.deleteTaskById(taskId, taskType);
+
+        switch (taskType) {
+            case TASK:
+                taskManager.deleteTaskByIdNew(taskId);
+                break;
+            case EPIC:
+                taskManager.deleteEpicById(taskId);
+                break;
+            case SUBTASK:
+                taskManager.deleteSubtaskById(taskId);
+                break;
+        }
     }
 
     static void printEpicSubtasks() {
