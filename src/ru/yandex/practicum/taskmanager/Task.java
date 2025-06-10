@@ -3,23 +3,25 @@ package ru.yandex.practicum.taskmanager;
 import java.util.Objects;
 
 public class Task {
+    private final int id;
     private final String name;
     private final String description;
-    private final int id;
     private final TaskStatus status;
+    private final TaskType taskType;
 
-    Task(String name, String description, int id, TaskStatus status) {
+    Task(int id, String name, String description, TaskStatus status, TaskType type) {
         this.name = name;
         this.description = description;
         this.id = id;
         this.status = status;
+        this.taskType = type;
     }
 
     public int getId() {
         return id;
     }
 
-    public String getName () {
+    public String getName() {
         return name;
     }
 
@@ -27,14 +29,13 @@ public class Task {
         return description;
     }
 
-//    public void setDescription(String description) {
-//        this.description = description;
-//    }
-
     public TaskStatus getStatus() {
         return status;
     }
 
+    public TaskType getTaskType() {
+        return taskType;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -51,10 +52,11 @@ public class Task {
     @Override
     public String toString() {
         return "Task{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", id=" + id +
                 ", status=" + status +
+                ", type=" + taskType +
                 '}';
     }
 }

@@ -3,8 +3,8 @@ package ru.yandex.practicum.taskmanager;
 public class Subtask extends Task {
     private final int epicId;
 
-    Subtask(String name, String description, int id, TaskStatus status, int epicId) {
-        super(name, description, id, status);
+    Subtask(int id, String name, String description, TaskStatus status, int epicId, TaskType type) {
+        super(id, name, description, status, type);
         this.epicId = epicId;
     }
 
@@ -16,11 +16,12 @@ public class Subtask extends Task {
     public String toString() {
 
         return "Subtask{" +
-                "name='" + super.getName() + '\'' +
+                "id=" + super.getId() +
+                ", name='" + super.getName() + '\'' +
                 ", description='" + super.getDescription() + '\'' +
-                ", id=" + super.getId() +
                 ", status=" + super.getStatus() +
                 ", epicId=" + epicId +
+                ", type=" + super.getTaskType() +
                 '}';
     }
 }
