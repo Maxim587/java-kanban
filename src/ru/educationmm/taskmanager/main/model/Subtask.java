@@ -1,11 +1,16 @@
-package ru.yandex.practicum.taskmanager;
+package ru.educationmm.taskmanager.main.model;
 
 public class Subtask extends Task {
     private final int epicId;
 
-    Subtask(int id, String name, String description, TaskStatus status, int epicId, TaskType type) {
-        super(id, name, description, status, type);
+    public Subtask(String name, String description, int epicId, TaskStatus status) {
+        super(name, description, status);
         this.epicId = epicId;
+    }
+
+    public Subtask(Subtask subtask) {
+        super(subtask);
+        this.epicId = subtask.getEpicId();
     }
 
     public int getEpicId() {
@@ -15,9 +20,8 @@ public class Subtask extends Task {
     @Override
     public String toString() {
 
-        return "Task{" +
-                "type=" + super.getTaskType() +
-                ", id=" + super.getId() +
+        return "Subtask{" +
+                "id=" + super.getId() +
                 ", name='" + super.getName() + '\'' +
                 ", description='" + super.getDescription() + '\'' +
                 ", status=" + super.getStatus() +

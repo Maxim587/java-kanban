@@ -1,4 +1,4 @@
-package ru.yandex.practicum.taskmanager;
+package ru.educationmm.taskmanager.main.model;
 
 public enum TaskStatus {
     NEW,

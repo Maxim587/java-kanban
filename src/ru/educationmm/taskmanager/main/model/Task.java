@@ -1,20 +1,26 @@
-package ru.yandex.practicum.taskmanager;
+package ru.educationmm.taskmanager.main.model;
 
+import ru.educationmm.taskmanager.main.service.TaskManager;
 import java.util.Objects;
 
 public class Task {
     private final int id;
-    private final String name;
-    private final String description;
-    private final TaskStatus status;
-    private final TaskType taskType;
+    private String name;
+    private String description;
+    private TaskStatus status;
 
-    Task(int id, String name, String description, TaskStatus status, TaskType type) {
+    public Task(String name, String description, TaskStatus status) {
+        id = TaskManager.generateTaskId();
         this.name = name;
         this.description = description;
-        this.id = id;
         this.status = status;
-        this.taskType = type;
+    }
+
+    public Task(Task task) {
+        this.id = task.getId();
+        this.name = task.getName();
+        this.description = task.getDescription();
+        this.status = task.getStatus();
     }
 
     public int getId() {
@@ -33,8 +39,16 @@ public class Task {
         return status;
     }
 
-    public TaskType getTaskType() {
-        return taskType;
+    public void setStatus(TaskStatus status) {
+        this.status = status;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
@@ -52,8 +66,7 @@ public class Task {
     @Override
     public String toString() {
         return "Task{" +
-                "type=" + taskType +
-                ", id=" + id +
+                "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
