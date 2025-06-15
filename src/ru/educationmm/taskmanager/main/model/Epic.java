@@ -10,15 +10,8 @@ public class Epic extends Task {
         epicSubtasks = new ArrayList<>();
     }
 
-    public Epic(Epic epic) {
-        super(epic);
-        this.epicSubtasks = epic.getEpicSubtasks();
-    }
-
     public ArrayList<Subtask> getEpicSubtasks() {
-        ArrayList<Subtask> epicSubtasksList = new ArrayList<>();
-        epicSubtasks.forEach(subtask -> epicSubtasksList.add(new Subtask(subtask)));
-        return epicSubtasksList;
+        return new ArrayList<>(epicSubtasks);
     }
 
     public void setStatus() {
@@ -75,7 +68,6 @@ public class Epic extends Task {
         });
         setStatus();
     }
-
 
     @Override
     public String toString() {
