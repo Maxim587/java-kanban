@@ -4,12 +4,12 @@ import ru.educationmm.taskmanager.main.model.Epic;
 import ru.educationmm.taskmanager.main.model.Subtask;
 import ru.educationmm.taskmanager.main.model.Task;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface TaskManager {
-    ArrayList<Task> getTasks();
-    ArrayList<Epic> getEpics();
-    ArrayList<Subtask> getSubtasks();
+    List<Task> getTasks();
+    List<Epic> getEpics();
+    List<Subtask> getSubtasks();
     boolean addTask(Task task);
     boolean addEpic(Epic epic);
     boolean addSubtask(Subtask subtask);
@@ -25,6 +25,6 @@ public interface TaskManager {
     boolean deleteTaskById(int taskId);
     boolean deleteEpicById(int epicId);
     boolean deleteSubtaskById(int subtaskId);
-    ArrayList<Subtask> getEpicSubtasks(int epicId);
-    ArrayList<Task> getHistory();
+    List<Subtask> getEpicSubtasks(int epicId);
+    List<Task> getHistory();
 }

@@ -1,10 +1,9 @@
 package ru.educationmm.taskmanager.main.service;
 
 import ru.educationmm.taskmanager.main.model.Task;
-import java.util.ArrayList;
+import java.util.List;
 
 public interface HistoryManager {
-
-    void add(Task task);
-    ArrayList<Task> getHistory();
+    boolean add(Task task);
+    List<Task> getHistory();
 }

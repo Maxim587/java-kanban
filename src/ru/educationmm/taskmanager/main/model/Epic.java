@@ -1,9 +1,10 @@
 package ru.educationmm.taskmanager.main.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Epic extends Task {
-    private final ArrayList<Subtask> epicSubtasks;
+    private final List<Subtask> epicSubtasks;
 
     public Epic(String name, String description) {
         super(name, description, TaskStatus.NEW);
@@ -15,7 +16,7 @@ public class Epic extends Task {
         this.epicSubtasks = epic.getEpicSubtasks();
     }
 
-    public ArrayList<Subtask> getEpicSubtasks() {
+    public List<Subtask> getEpicSubtasks() {
         return new ArrayList<>(epicSubtasks);
     }
 
@@ -51,8 +52,8 @@ public class Epic extends Task {
         setStatus();
     }
 
-    public ArrayList<Integer> getSubtaskIds() {
-        ArrayList<Integer> subtaskIds = new ArrayList<>();
+    public List<Integer> getSubtaskIds() {
+        List<Integer> subtaskIds = new ArrayList<>();
         epicSubtasks.forEach(subtask -> subtaskIds.add(subtask.getId()));
         return subtaskIds;
     }

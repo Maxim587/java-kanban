@@ -1,6 +1,6 @@
 package ru.educationmm.taskmanager.test;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +28,7 @@ class InMemoryHistoryManagerTest {
     @Test
     public void add() {
         historyManager.add(task);
-        ArrayList<Task> history = historyManager.getHistory();
+        List<Task> history = historyManager.getHistory();
         Assertions.assertNotNull(history, "После добавления задачи, история не должна быть пустой.");
         Assertions.assertEquals(1, history.size(), "После добавления задачи, история не должна быть пустой.");
     }
@@ -49,5 +49,14 @@ class InMemoryHistoryManagerTest {
                 "не сохраняется предыдущая версия описания задачи");
         Assertions.assertNotEquals(task.getStatus(), taskManager.getHistory().getFirst().getStatus(), "В истории " +
                 "не сохраняется предыдущая версия статуса задачи");
+    }
+
+    @Test
+    public void historySizeShouldNotBeMoreThan10() {
+        for (int i = 0; i < 11; i++) {
+            historyManager.add(new Task(task));
+        }
+        Assertions.assertEquals(10, historyManager.getHistory().size(), "История просмотров " +
+                "содержит более 10 элементов");
     }
 }
