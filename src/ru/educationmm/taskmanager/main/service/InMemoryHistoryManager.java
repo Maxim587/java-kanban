@@ -6,11 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
-
-    // Привет! Спасибо за наводку) Тоже сначала выбирал, читал эту статью https://javarush.com/groups/posts/1938-linkedlist
-    // и остановился на arraylist. Кстати, вот эта ссылка не открывается
-    // https://www.javatpoint.com/difference-between-arraylist-and-linkedlist
-
+    private static final int MAX_HISTORY_SIZE = 10;
     private final List<Task> taskHistory = new LinkedList<>();
 
     @Override
@@ -18,15 +14,14 @@ public class InMemoryHistoryManager implements HistoryManager {
         return new LinkedList<>(taskHistory);
     }
 
-    @Override
-    public boolean add(Task task) {
-        if (task == null) {
-            return false;
-        }
-        if (taskHistory.size() == 10) {
+    //Да, поторопился тут)  Оставил копирование задач при добавлении в историю, не знаю правильно или нет, но показалось, что
+    // в ТЗ есть требование про это "убедитесь, что задачи, добавляемые в HistoryManager, сохраняют предыдущую версию задачи и её данных."
+    // А статьи имбовые кстати, особенно про compute у мапы в прошлом спринте)
+
+    public void add(Task task) {
+        if (taskHistory.size() == MAX_HISTORY_SIZE) {
             taskHistory.removeFirst();
         }
         taskHistory.add(task);
-        return true;
     }
 }
