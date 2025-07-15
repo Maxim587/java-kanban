@@ -46,8 +46,9 @@ public class Main {
         inMemoryTaskManager.deleteEpicById(epic1.getId());
         printHistory(inMemoryTaskManager);
     }
-    static void printHistory(TaskManager inMemoryTaskManager){
-        for(Task task : inMemoryTaskManager.getHistory()) {
+
+    static void printHistory(TaskManager inMemoryTaskManager) {
+        for (Task task : inMemoryTaskManager.getHistory()) {
             System.out.println(task);
         }
         System.out.println();
