@@ -1,5 +1,3 @@
-package ru.educationmm.taskmanager.test;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import ru.educationmm.taskmanager.main.model.Task;
