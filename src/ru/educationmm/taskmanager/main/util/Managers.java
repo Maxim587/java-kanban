@@ -8,7 +8,8 @@ import ru.educationmm.taskmanager.main.service.TaskManager;
 
 public class Managers {
 
-    private Managers() {}
+    private Managers() {
+    }
 
     public static TaskManager getDefault() {
         return new InMemoryTaskManager();
