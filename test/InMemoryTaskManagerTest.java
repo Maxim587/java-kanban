@@ -7,18 +7,23 @@ import ru.educationmm.taskmanager.main.model.Subtask;
 import ru.educationmm.taskmanager.main.model.Task;
 import ru.educationmm.taskmanager.main.model.TaskStatus;
 import ru.educationmm.taskmanager.main.service.InMemoryTaskManager;
+import ru.educationmm.taskmanager.main.service.TaskManager;
 
 
 class InMemoryTaskManagerTest {
 
-    InMemoryTaskManager taskManager;
-    Task task;
-    Epic epic;
-    Subtask subtask;
+    public TaskManager taskManager;
+    public Task task;
+    public Epic epic;
+    public Subtask subtask;
+
+    public void setManager() {
+        taskManager = new InMemoryTaskManager();
+    }
 
     @BeforeEach
     public void prepare() {
-        taskManager = new InMemoryTaskManager();
+        setManager();
         task = new Task("test task", "test description", TaskStatus.NEW);
         taskManager.addTask(task);
         epic = new Epic("test epic", "test description");
