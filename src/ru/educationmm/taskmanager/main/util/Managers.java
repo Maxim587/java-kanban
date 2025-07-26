@@ -1,10 +1,6 @@
 package ru.educationmm.taskmanager.main.util;
 
-import ru.educationmm.taskmanager.main.service.HistoryManager;
-import ru.educationmm.taskmanager.main.service.InMemoryHistoryManager;
-import ru.educationmm.taskmanager.main.service.InMemoryTaskManager;
-import ru.educationmm.taskmanager.main.service.TaskManager;
-
+import ru.educationmm.taskmanager.main.service.*;
 
 public class Managers {
 

@@ -13,17 +13,17 @@ public interface TaskManager {
 
     List<Subtask> getSubtasks();
 
-    boolean addTask(Task task);
+    void addTask(Task task);
 
-    boolean addEpic(Epic epic);
+    void addEpic(Epic epic);
 
-    boolean addSubtask(Subtask subtask);
+    void addSubtask(Subtask subtask);
 
-    boolean deleteAllTasks();
+    void deleteAllTasks();
 
-    boolean deleteAllEpics();
+    void deleteAllEpics();
 
-    boolean deleteAllSubtasks();
+    void deleteAllSubtasks();
 
     Task getTaskById(int taskId);
 
@@ -31,17 +31,17 @@ public interface TaskManager {
 
     Subtask getSubtaskById(int subtaskId);
 
-    boolean updateTask(Task task);
+    void updateTask(Task task);
 
-    boolean updateEpic(Epic epic);
+    void updateEpic(Epic epic);
 
-    boolean updateSubtask(Subtask subtask);
+    void updateSubtask(Subtask subtask);
 
-    boolean deleteTaskById(int taskId);
+    void deleteTaskById(int taskId);
 
-    boolean deleteEpicById(int epicId);
+    void deleteEpicById(int epicId);
 
-    boolean deleteSubtaskById(int subtaskId);
+    void deleteSubtaskById(int subtaskId);
 
     List<Subtask> getEpicSubtasks(int epicId);
 

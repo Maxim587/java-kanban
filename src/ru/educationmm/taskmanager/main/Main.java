@@ -7,7 +7,6 @@ import ru.educationmm.taskmanager.main.model.TaskStatus;
 import ru.educationmm.taskmanager.main.service.TaskManager;
 import ru.educationmm.taskmanager.main.util.Managers;
 
-
 public class Main {
 
     public static void main(String[] args) {
