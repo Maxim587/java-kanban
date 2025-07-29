@@ -53,6 +53,10 @@ public class Task {
         this.status = status;
     }
 
+    public TaskType getType() {
+        return TaskType.TASK;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -67,6 +71,6 @@ public class Task {
 
     @Override
     public String toString() {
-        return String.format("%d,%s,%s,%s,%s,", id, TaskType.TASK, name, status, description);
+        return String.format("%d,%s,%s,%s,%s,", id, getType(), name, status, description);
     }
 }

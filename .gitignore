@@ -24,3 +24,4 @@ hs_err_pid*
 
 /.idea
 /src/ru/educationmm/taskmanager/main/util/console_interface/
+/java-kanban.iml

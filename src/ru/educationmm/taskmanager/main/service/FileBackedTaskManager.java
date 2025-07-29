@@ -3,13 +3,8 @@ package ru.educationmm.taskmanager.main.service;
 import ru.educationmm.taskmanager.main.exception.ManagerSaveException;
 import ru.educationmm.taskmanager.main.model.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -22,97 +17,60 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         this.file = file;
     }
 
-    public FileBackedTaskManager(File file,
-                                 Map<Integer, Task> tasks,
-                                 Map<Integer, Epic> epics,
-                                 Map<Integer, Subtask> subtasks,
-                                 int id) {
-        super.tasks = tasks;
-        super.epics = epics;
-        super.subtasks = subtasks;
-        super.id = id;
-        this.file = file;
-    }
+    public static FileBackedTaskManager loadFromFile(File file) {
 
-    public static FileBackedTaskManager loadFromFile(File file) throws IOException {
-
-        if (!file.isFile()) {
-            throw new FileNotFoundException("Указанный файл не существует");
-        }
-
-        Map<Integer, Task> tasks = new HashMap<>();
-        Map<Integer, Epic> epics = new HashMap<>();
-        Map<Integer, Subtask> subtasks = new HashMap<>();
-        String taskEntry;
+        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
         int latestTaskId = 0;
+        String taskEntry = "";
 
-        List<String> tasksFromFile = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
+        try (BufferedReader br = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
+            br.readLine();
+            while (br.ready()) {
+                taskEntry = br.readLine();
+                Task task = fromString(taskEntry);
 
-        for (int i = 1; i < tasksFromFile.size(); i++) {
-            taskEntry = tasksFromFile.get(i);
-            Task task = fromString(taskEntry);
-
-            if (task == null) {
-                return null;
-            }
-
-            if (task.getId() > latestTaskId) {
-                latestTaskId = task.getId();
-            }
-
-            switch (task.getClass().getSimpleName()) {
-                case "Epic" -> epics.put(task.getId(), (Epic) task);
-                case "Subtask" -> {
-                    Epic subtaskEpic = epics.get(((Subtask) task).getEpicId());
-                    subtasks.put(task.getId(), (Subtask) task);
-                    subtaskEpic.addSubtaskToEpic((Subtask) task);
+                switch (task.getType()) {
+                    case TASK -> fileBackedTaskManager.tasks.put(task.getId(), task);
+                    case EPIC -> fileBackedTaskManager.epics.put(task.getId(), (Epic) task);
+                    case SUBTASK -> {
+                        int epicId = ((Subtask) task).getEpicId();
+                        fileBackedTaskManager.subtasks.put(task.getId(), (Subtask) task);
+                        fileBackedTaskManager.getEpicById(epicId).addSubtaskToEpic((Subtask) task);
+                    }
                 }
-                case "Task" -> tasks.put(task.getId(), task);
-                default -> {
-                    return null;
+
+                if (task.getId() > latestTaskId) {
+                    latestTaskId = task.getId();
                 }
             }
+            fileBackedTaskManager.id = latestTaskId;
+        } catch (IllegalArgumentException | IOException e) {
+            System.out.println("Некорректные значения полей в строке: " + taskEntry);
+            e.printStackTrace();
+            return null;
         }
-        return new FileBackedTaskManager(file, tasks, epics, subtasks, latestTaskId);
+
+        return fileBackedTaskManager;
     }
 
-    private static Task fromString(String value) {
-        String[] taskFields;
-        TaskType taskType;
-        int id;
-        String name;
-        String description;
-        TaskStatus status;
+    private static Task fromString(String value) throws IllegalArgumentException {
+        String[] taskFields = value.split(",", -1);
+
+        if (taskFields.length != 6) {
+            throw new IllegalArgumentException("Количество полей не соответствует формату");
+        }
+
+        int id = Integer.parseInt(taskFields[0].trim());
         int subtaskParentEpicId = 0;
 
-        taskFields = value.split(",", -1);
-        if (taskFields.length != 6) {
-            System.out.println("Количество полей не соответствует формату в строке\n" + value);
-            return null;
+        if (!taskFields[5].isBlank()) {
+            subtaskParentEpicId = Integer.parseInt(taskFields[5].trim());
         }
 
-        try {
-            id = Integer.parseInt(taskFields[0].trim());
-            if (!taskFields[5].isBlank()) {
-                subtaskParentEpicId = Integer.parseInt(taskFields[5].trim());
-            }
-        } catch (NumberFormatException e) {
-            System.out.format("Некорректное значение поля в строке %n%s", value);
-            e.printStackTrace();
-            return null;
-        }
-
-        try {
-            taskType = TaskType.valueOf(taskFields[1].trim().toUpperCase());
-            status = TaskStatus.valueOf(taskFields[3].trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            System.out.format("Некорректное значение поля в строке %n%s", value);
-            e.printStackTrace();
-            return null;
-        }
-
-        name = taskFields[2];
-        description = taskFields[4];
+        TaskType taskType = TaskType.valueOf(taskFields[1].trim().toUpperCase());
+        TaskStatus status = TaskStatus.valueOf(taskFields[3].trim().toUpperCase());
+        String name = taskFields[2];
+        String description = taskFields[4];
 
         switch (taskType) {
             case TASK:
@@ -122,7 +80,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             case EPIC:
                 Epic epic = new Epic(name, description);
                 epic.setId(id);
-                epic.setStatus();
                 return epic;
             case SUBTASK:
                 Subtask subtask = new Subtask(name, description, subtaskParentEpicId, status);
@@ -133,18 +90,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private void save() {
-        try (FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8)) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
             writer.write(HEADER + NEW_LINE);
 
-            for (Task task : super.tasks.values()) {
+            for (Task task : tasks.values()) {
                 writer.write(task.toString() + NEW_LINE);
             }
 
-            for (Epic epic : super.epics.values()) {
+            for (Epic epic : epics.values()) {
                 writer.write(epic.toString() + NEW_LINE);
             }
 
-            for (Subtask subtask : super.subtasks.values()) {
+            for (Subtask subtask : subtasks.values()) {
                 writer.write(subtask.toString() + NEW_LINE);
             }
         } catch (IOException e) {

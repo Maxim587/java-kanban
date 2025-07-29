@@ -40,14 +40,7 @@ public class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
         Subtask subtask3 = new Subtask("test subtask3", "test description3", epic2.getId(), TaskStatus.DONE);
         taskManager.addSubtask(subtask3);
 
-        TaskManager taskManagerFromFile;
-
-        try {
-            taskManagerFromFile = FileBackedTaskManager.loadFromFile(file);
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка открытия файла", e);
-        }
-
+        TaskManager taskManagerFromFile = FileBackedTaskManager.loadFromFile(file);
         Assertions.assertNotNull(taskManagerFromFile, "Объект fileBackedTaskManager должен быть создан");
 
         for (TaskType type : TaskType.values()) {
