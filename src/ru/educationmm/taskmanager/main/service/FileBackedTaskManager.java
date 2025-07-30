@@ -25,18 +25,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         try (BufferedReader br = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
             br.readLine();
+
             while (br.ready()) {
                 taskEntry = br.readLine();
                 Task task = fromString(taskEntry);
 
                 switch (task.getType()) {
-                    case TASK -> fileBackedTaskManager.tasks.put(task.getId(), task);
-                    case EPIC -> fileBackedTaskManager.epics.put(task.getId(), (Epic) task);
-                    case SUBTASK -> {
-                        int epicId = ((Subtask) task).getEpicId();
-                        fileBackedTaskManager.subtasks.put(task.getId(), (Subtask) task);
-                        fileBackedTaskManager.getEpicById(epicId).addSubtaskToEpic((Subtask) task);
-                    }
+                    case TASK -> fileBackedTaskManager.addTaskToMemory(task);
+                    case EPIC -> fileBackedTaskManager.addEpicToMemory((Epic) task);
+                    case SUBTASK -> fileBackedTaskManager.addSubtaskToMemory((Subtask) task);
                 }
 
                 if (task.getId() > latestTaskId) {
@@ -116,16 +113,28 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         save();
     }
 
+    private void addTaskToMemory(Task task) {
+        super.addTask(task);
+    }
+
     @Override
     public void addEpic(Epic epic) {
         super.addEpic(epic);
         save();
     }
 
+    private void addEpicToMemory(Epic epic) {
+        super.addEpic(epic);
+    }
+
     @Override
     public void addSubtask(Subtask subtask) {
         super.addSubtask(subtask);
         save();
+    }
+
+    private void addSubtaskToMemory(Subtask subtask) {
+        super.addSubtask(subtask);
     }
 
     // DELETE ALL
