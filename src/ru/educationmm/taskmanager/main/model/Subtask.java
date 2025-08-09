@@ -1,10 +1,12 @@
 package ru.educationmm.taskmanager.main.model;
 
+import java.time.LocalDateTime;
+
 public class Subtask extends Task {
     private final int epicId;
 
-    public Subtask(String name, String description, int epicId, TaskStatus status) {
-        super(name, description, status);
+    public Subtask(String name, String description, int epicId, TaskStatus status, long durationInMinutes, LocalDateTime startTime) {
+        super(name, description, status, durationInMinutes, startTime);
         this.epicId = epicId;
     }
 
@@ -24,8 +26,8 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-
-        return String.format("%d,%s,%s,%s,%s,%d", getId(), getType(), getName(),
-                getStatus(), getDescription(), epicId);
+        String startTime = getStartTime() == null ? "" : getStartTime().format(DATE_TIME_FORMATTER);
+        return String.format("%d,%s,%s,%s,%s,%d,%d,%s", getId(), getType(), getName(),
+                getStatus(), getDescription(), epicId, getDuration().toMinutes(), startTime);
     }
 }
