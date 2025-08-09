@@ -1,27 +1,28 @@
 package ru.educationmm.taskmanager.main;
 
-import ru.educationmm.taskmanager.main.model.Epic;
-import ru.educationmm.taskmanager.main.model.Subtask;
-import ru.educationmm.taskmanager.main.model.Task;
-import ru.educationmm.taskmanager.main.model.TaskStatus;
+import ru.educationmm.taskmanager.main.model.*;
 import ru.educationmm.taskmanager.main.service.TaskManager;
 import ru.educationmm.taskmanager.main.util.Managers;
+
+import java.time.LocalDateTime;
+import java.time.Month;
 
 public class Main {
 
     public static void main(String[] args) {
         TaskManager fileBackedTaskManager = Managers.getDefault();
-        Task task1 = new Task("test", "test", TaskStatus.NEW);
-        Task task2 = new Task("test", "test", TaskStatus.NEW);
+        LocalDateTime startTime = LocalDateTime.of(2025, Month.JUNE, 3, 22, 22);
+        Task task1 = new Task("test", "test", TaskStatus.NEW, 5, startTime);
+        Task task2 = new Task("test", "test", TaskStatus.NEW, 5, startTime.plusHours(1));
         Epic epic1 = new Epic("test", "test");
         Epic epic2 = new Epic("test", "test");
         fileBackedTaskManager.addTask(task1);
         fileBackedTaskManager.addTask(task2);
         fileBackedTaskManager.addEpic(epic1);
         fileBackedTaskManager.addEpic(epic2);
-        Subtask subtask1 = new Subtask("test", "test", epic1.getId(), TaskStatus.NEW);
-        Subtask subtask2 = new Subtask("test", "test", epic1.getId(), TaskStatus.NEW);
-        Subtask subtask3 = new Subtask("test", "test", epic1.getId(), TaskStatus.NEW);
+        Subtask subtask1 = new Subtask("test", "test", epic1.getId(), TaskStatus.NEW, 5, startTime.plusHours(2));
+        Subtask subtask2 = new Subtask("test", "test", epic1.getId(), TaskStatus.NEW, 5, startTime.plusHours(3));
+        Subtask subtask3 = new Subtask("test", "test", epic1.getId(), TaskStatus.NEW, 5, startTime.plusHours(4));
         fileBackedTaskManager.addSubtask(subtask1);
         fileBackedTaskManager.addSubtask(subtask2);
         fileBackedTaskManager.addSubtask(subtask3);

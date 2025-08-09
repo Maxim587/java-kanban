@@ -5,10 +5,12 @@ import ru.educationmm.taskmanager.main.model.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-    private static final String HEADER = "id,type,name,status,description,epic";
+    private static final String HEADER = "id,type,name,status,description,epic,duration,startTime";
     private static final String NEW_LINE = System.lineSeparator();
     private final File file;
 
@@ -18,7 +20,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     public static FileBackedTaskManager loadFromFile(File file) {
-
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
         int latestTaskId = 0;
         String taskEntry = "";
@@ -41,6 +42,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
             }
             fileBackedTaskManager.id = latestTaskId;
+        } catch (FileNotFoundException e) {
+            System.out.println("Ошибка чтения файла. Файл не найден");
+            e.printStackTrace();
+            return null;
         } catch (IllegalArgumentException | IOException e) {
             System.out.println("Некорректные значения полей в строке: " + taskEntry);
             e.printStackTrace();
@@ -50,28 +55,41 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return fileBackedTaskManager;
     }
 
-    private static Task fromString(String value) throws IllegalArgumentException {
+    public static Task fromString(String value) throws IllegalArgumentException {
         String[] taskFields = value.split(",", -1);
+        int properNumberOfColumnsInFile = 8;
 
-        if (taskFields.length != 6) {
+        if (taskFields.length != properNumberOfColumnsInFile) {
             throw new IllegalArgumentException("Количество полей не соответствует формату");
         }
 
         int id = Integer.parseInt(taskFields[0].trim());
-        int subtaskParentEpicId = 0;
+        TaskType taskType = TaskType.valueOf(taskFields[1].trim().toUpperCase());
+        String name = taskFields[2];
+        TaskStatus status = TaskStatus.valueOf(taskFields[3].trim().toUpperCase());
+        String description = taskFields[4];
 
+        int subtaskParentEpicId = 0;
         if (!taskFields[5].isBlank()) {
             subtaskParentEpicId = Integer.parseInt(taskFields[5].trim());
         }
 
-        TaskType taskType = TaskType.valueOf(taskFields[1].trim().toUpperCase());
-        TaskStatus status = TaskStatus.valueOf(taskFields[3].trim().toUpperCase());
-        String name = taskFields[2];
-        String description = taskFields[4];
+        long duration = Long.parseLong(taskFields[6].trim());
+
+        LocalDateTime startTime;
+        if (taskFields[7].isBlank()) {
+            startTime = null;
+        } else {
+            try {
+                startTime = LocalDateTime.parse(taskFields[7], Task.DATE_TIME_FORMATTER);
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("Некорректный формат startTime в строке: " + value, e);
+            }
+        }
 
         switch (taskType) {
             case TASK:
-                Task task = new Task(name, description, status);
+                Task task = new Task(name, description, status, duration, startTime);
                 task.setId(id);
                 return task;
             case EPIC:
@@ -79,14 +97,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 epic.setId(id);
                 return epic;
             case SUBTASK:
-                Subtask subtask = new Subtask(name, description, subtaskParentEpicId, status);
+                Subtask subtask = new Subtask(name, description, subtaskParentEpicId, status, duration, startTime);
                 subtask.setId(id);
                 return subtask;
         }
         return null;
     }
 
-    private void save() {
+    public void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
             writer.write(HEADER + NEW_LINE);
 

@@ -1,13 +1,13 @@
 package ru.educationmm.taskmanager.main.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Duration;
+import java.util.*;
 
 public class Epic extends Task {
     private final List<Subtask> epicSubtasks;
 
     public Epic(String name, String description) {
-        super(name, description, TaskStatus.NEW);
+        super(name, description, TaskStatus.NEW, 0, null);
         epicSubtasks = new ArrayList<>();
     }
 
@@ -20,36 +20,37 @@ public class Epic extends Task {
         return new ArrayList<>(epicSubtasks);
     }
 
-    public void setStatus() {
-        TaskStatus newStatus;
+    public void setCalculatedFields() {
+        Duration duration = Duration.ofMinutes(0);
+        Set<TaskStatus> statuses = new HashSet<>();
 
-        if (epicSubtasks.isEmpty()) {
-            newStatus = TaskStatus.NEW;
-        } else {
-            boolean isNew = true;
-            boolean isDone = true;
+        epicSubtasks.forEach(subtask -> {
+            duration.plus(subtask.getDuration());
+            statuses.add(subtask.getStatus());
 
-            for (Subtask subtask : epicSubtasks) {
-                isNew = isNew && (subtask.getStatus() == TaskStatus.NEW);
-                isDone = isDone && (subtask.getStatus() == TaskStatus.DONE);
-            }
-            if (isNew) {
-                newStatus = TaskStatus.NEW;
-            } else if (isDone) {
-                newStatus = TaskStatus.DONE;
+            if (getStartTime() == null) {
+                setStartTime(subtask.getStartTime());
             } else {
-                newStatus = TaskStatus.IN_PROGRESS;
+                if (getStartTime().isAfter(subtask.getStartTime())) {
+                    setStartTime(subtask.getStartTime());
+                }
             }
-        }
+        });
+        setDuration(duration);
 
-        if (this.getStatus() != newStatus) {
-            this.setStatus(newStatus);
+        TaskStatus status = TaskStatus.NEW;
+        if (statuses.contains(TaskStatus.IN_PROGRESS) ||
+                (statuses.contains(TaskStatus.NEW) && statuses.contains(TaskStatus.DONE))) {
+            status = TaskStatus.IN_PROGRESS;
+        } else if (statuses.contains(TaskStatus.DONE)) {
+            status = TaskStatus.DONE;
         }
+        setStatus(status);
     }
 
     public void addSubtaskToEpic(Subtask subtask) {
         epicSubtasks.add(subtask);
-        setStatus();
+        setCalculatedFields();
     }
 
     public List<Integer> getSubtaskIds() {
@@ -72,7 +73,7 @@ public class Epic extends Task {
                 epicSubtasks.set(epicSubtasks.indexOf(subtaskInEpic), subtask);
             }
         });
-        setStatus();
+        setCalculatedFields();
     }
 
     @Override
@@ -82,8 +83,8 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-
-        return String.format("%d,%s,%s,%s,%s,", getId(), getType(), getName(),
-                getStatus(), getDescription());
+        String startTime = getStartTime() == null ? "" : getStartTime().format(DATE_TIME_FORMATTER);
+        return String.format("%d,%s,%s,%s,%s,,%d,%s", getId(), getType(), getName(),
+                getStatus(), getDescription(), getDuration().toMinutes(), startTime);
     }
 }

@@ -2,24 +2,25 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import ru.educationmm.taskmanager.main.model.Epic;
-import ru.educationmm.taskmanager.main.model.Subtask;
-import ru.educationmm.taskmanager.main.model.Task;
-import ru.educationmm.taskmanager.main.model.TaskStatus;
+import ru.educationmm.taskmanager.main.model.*;
 import ru.educationmm.taskmanager.main.service.InMemoryHistoryManager;
 import ru.educationmm.taskmanager.main.service.InMemoryTaskManager;
 import ru.educationmm.taskmanager.main.service.TaskManager;
+
+import java.time.LocalDateTime;
+import java.time.Month;
 
 
 class InMemoryHistoryManagerTest {
 
     TaskManager taskManager;
     Task task;
+    public LocalDateTime startTime = LocalDateTime.of(2025, Month.JUNE, 15, 10, 50);
 
     @BeforeEach
     public void prepare() {
         taskManager = new InMemoryTaskManager();
-        task = new Task("test", "test", TaskStatus.NEW);
+        task = new Task("test", "test", TaskStatus.NEW, 15, startTime);
     }
 
     @Test
@@ -35,7 +36,7 @@ class InMemoryHistoryManagerTest {
         Epic epic = new Epic("test", "test");
         taskManager.addTask(task);
         taskManager.addEpic(epic);
-        Subtask subtask = new Subtask("test", "test", epic.getId(), TaskStatus.NEW);
+        Subtask subtask = new Subtask("test", "test", epic.getId(), TaskStatus.NEW, 15, startTime.plusHours(1));
         taskManager.addSubtask(subtask);
 
         taskManager.getTaskById(task.getId());
@@ -62,7 +63,7 @@ class InMemoryHistoryManagerTest {
         Assertions.assertEquals(0, taskManager.getHistory().size(), "При удалении всех эпиков, все эпики и их подзадачи должны удаляться из истории");
 
         taskManager.addEpic(epic);
-        subtask = new Subtask("test", "test", epic.getId(), TaskStatus.NEW);
+        subtask = new Subtask("test", "test", epic.getId(), TaskStatus.NEW, 15, startTime);
         taskManager.addSubtask(subtask);
         taskManager.getSubtaskById(subtask.getId());
         Assertions.assertEquals(1, taskManager.getHistory().size(), "После просмотра подзадачи, история не должна быть пустой.");
@@ -80,7 +81,7 @@ class InMemoryHistoryManagerTest {
         Epic epic = new Epic("test", "test");
         taskManager.addTask(task);
         taskManager.addEpic(epic);
-        Subtask subtask = new Subtask("test", "test", epic.getId(), TaskStatus.NEW);
+        Subtask subtask = new Subtask("test", "test", epic.getId(), TaskStatus.NEW, 15, startTime.plusHours(1));
         taskManager.addSubtask(subtask);
 
         Assertions.assertEquals(0, taskManager.getHistory().size(), "Первоначально история должна быть пустой");
@@ -94,11 +95,11 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    public void afterNodeRemovalHistoryOrderShouldNotBeChanged() {
+    public void afterTaskRemovalHistoryOrderShouldNotBeChanged() {
         InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
-        Task task2 = new Task(task);
-        Task task3 = new Task(task);
-        Task task4 = new Task(task);
+        Task task2 = new Task("task2", "", TaskStatus.NEW, 10, startTime.plusHours(1));
+        Task task3 = new Task("task3", "", TaskStatus.NEW, 10, startTime.plusHours(2));
+        Task task4 = new Task("task4", "", TaskStatus.NEW, 10, startTime.plusHours(3));
         task.setId(1);
         task2.setId(2);
         task3.setId(3);
