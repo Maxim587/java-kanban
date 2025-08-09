@@ -92,7 +92,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
     public void testExceptionsDuringFileSaving() {
         Assertions.assertDoesNotThrow(taskManager::save, "Сохранение задач в файл не должно приводить к исключениям");
 
-        String illegalFileName = "*:;?><";
+        String illegalFileName = "";
         FileBackedTaskManager taskManager1 = new FileBackedTaskManager(new File(illegalFileName));
         Assertions.assertThrows(ManagerSaveException.class, taskManager1::save, "Если файл не может быть сохранен, " +
                 "должно быть выброшено исключение");
