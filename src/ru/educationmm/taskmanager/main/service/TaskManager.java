@@ -48,11 +48,11 @@ public interface TaskManager {
 
     List<Task> getHistory();
 
-    void addToPrioritizedSet(Task task);
+    //void addToPrioritizedSet(Task task);
 
-    List<Task> getPrioritizedTasks();
+    //List<Task> getPrioritizedTasks();
 
-    boolean isIntersectingTasks(Task task1, Task task2);
+    //boolean isIntersectingTasks(Task task1, Task task2);
 
-    boolean checkExistingIntersections(Task task);
+    //boolean checkExistingIntersections(Task task);
 }

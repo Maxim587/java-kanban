@@ -7,7 +7,7 @@ import ru.educationmm.taskmanager.main.util.Managers;
 
 import java.util.*;
 
-public class InMemoryTaskManager implements TaskManager {
+public class InMemoryTaskManager implements TaskManager, TimePrioritized {
     protected int id;
     protected final Map<Integer, Task> tasks;
     protected final Map<Integer, Epic> epics;

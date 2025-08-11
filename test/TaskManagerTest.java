@@ -3,13 +3,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.educationmm.taskmanager.main.model.*;
 import ru.educationmm.taskmanager.main.service.TaskManager;
+import ru.educationmm.taskmanager.main.service.TimePrioritized;
 
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class TaskManagerTest<T extends TaskManager> {
+public abstract class TaskManagerTest<T extends TaskManager & TimePrioritized> {
 
     protected T taskManager;
     protected Task task;
@@ -178,6 +179,16 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
+    void subtasksShouldHaveEpicIds() {
+        Subtask subtask1 = new Subtask("subtask1", "description", 1, TaskStatus.NEW, 30, startTime);
+        Subtask subtask2 = new Subtask("subtask2", "description", 1, TaskStatus.NEW, 30, startTime.plusHours(1));
+        subtask1.setId(4);
+        subtask2.setId(5);
+        boolean isEpicIdNotSet = taskManager.getSubtasks().stream().anyMatch(subtask -> subtask.getEpicId() <= 0);
+        Assertions.assertFalse(isEpicIdNotSet, "Подзадача должна содержать epicId");
+    }
+
+    @Test
     public void prioritizedTaskListShouldContainTaskOrderedByStartTime() {
         Task taskBefore = new Task("task before", "", TaskStatus.NEW, 2, startTime.minusMinutes(20));
         Task taskBetween = new Task("task between", "", TaskStatus.NEW, 1, task.getEndTime().plusMinutes(2));
@@ -201,13 +212,29 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void subtasksShouldHaveEpicIds() {
-        Subtask subtask1 = new Subtask("subtask1", "description", 1, TaskStatus.NEW, 30, startTime);
-        Subtask subtask2 = new Subtask("subtask2", "description", 1, TaskStatus.NEW, 30, startTime.plusHours(1));
-        subtask1.setId(4);
-        subtask2.setId(5);
-        boolean isEpicIdNotSet = taskManager.getSubtasks().stream().anyMatch(subtask -> subtask.getEpicId() <= 0);
-        Assertions.assertFalse(isEpicIdNotSet, "Подзадача должна содержать epicId");
-    }
+    public void isIntersectingTasks() {
+        //Пересекающиеся задачи, у которых совпадает время старта и время окончания
+        Task task2 = new Task(task);
+        Assertions.assertTrue(taskManager.isIntersectingTasks(task, task2), "Должно быть выявлено пересечение задач");
 
+        //Пересекающиеся задачи, у которых отличается время старта и время окончания
+        task2 = new Task("task2", "task2", TaskStatus.NEW, 30, startTime.plusMinutes(10));
+        Assertions.assertTrue(taskManager.isIntersectingTasks(task, task2), "Должно быть выявлено пересечение задач");
+
+        //Пересекающиеся задачи, у которых совпадает время старта и отличается время окончания
+        task2 = new Task("task2", "task2", TaskStatus.NEW, 30, startTime);
+        Assertions.assertTrue(taskManager.isIntersectingTasks(task, task2), "Должно быть выявлено пересечение задач");
+
+        //Пересекающиеся задачи, у которых отличается время старта и совпадает время окончания
+        task2 = new Task("task2", "task2", TaskStatus.NEW, 15, startTime.plusMinutes(5));
+        Assertions.assertTrue(taskManager.isIntersectingTasks(task, task2), "Должно быть выявлено пересечение задач");
+
+        //Пересекающиеся задачи, у которых время окончания первой задачи совпадает с временем начала второй
+        task2 = new Task("task2", "task2", TaskStatus.NEW, 30, task.getEndTime());
+        Assertions.assertTrue(taskManager.isIntersectingTasks(task, task2), "Должно быть выявлено пересечение задач");
+
+        //Непересекающиеся задачи
+        task2 = new Task("task2", "task2", TaskStatus.NEW, 30, task.getEndTime().plusMinutes(5));
+        Assertions.assertFalse(taskManager.isIntersectingTasks(task, task2), "Должно быть выявлено отсутствие пересечения задач");
+    }
 }
