@@ -1,6 +1,9 @@
 package ru.educationmm.taskmanager.main;
 
-import ru.educationmm.taskmanager.main.model.*;
+import ru.educationmm.taskmanager.main.model.Epic;
+import ru.educationmm.taskmanager.main.model.Subtask;
+import ru.educationmm.taskmanager.main.model.Task;
+import ru.educationmm.taskmanager.main.model.TaskStatus;
 import ru.educationmm.taskmanager.main.service.TaskManager;
 import ru.educationmm.taskmanager.main.util.Managers;
 
@@ -18,14 +21,14 @@ public class Main {
         Epic epic2 = new Epic("test", "test");
         fileBackedTaskManager.addTask(task1);
         fileBackedTaskManager.addTask(task2);
-        fileBackedTaskManager.addEpic(epic1);
-        fileBackedTaskManager.addEpic(epic2);
+        fileBackedTaskManager.addTask(epic1);
+        fileBackedTaskManager.addTask(epic2);
         Subtask subtask1 = new Subtask("test", "test", epic1.getId(), TaskStatus.NEW, 5, startTime.plusHours(2));
         Subtask subtask2 = new Subtask("test", "test", epic1.getId(), TaskStatus.NEW, 5, startTime.plusHours(3));
         Subtask subtask3 = new Subtask("test", "test", epic1.getId(), TaskStatus.NEW, 5, startTime.plusHours(4));
-        fileBackedTaskManager.addSubtask(subtask1);
-        fileBackedTaskManager.addSubtask(subtask2);
-        fileBackedTaskManager.addSubtask(subtask3);
+        fileBackedTaskManager.addTask(subtask1);
+        fileBackedTaskManager.addTask(subtask2);
+        fileBackedTaskManager.addTask(subtask3);
 
         fileBackedTaskManager.getEpicById(epic1.getId());
         fileBackedTaskManager.getSubtaskById(subtask3.getId());

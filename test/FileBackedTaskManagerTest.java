@@ -35,11 +35,11 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         Task task3 = new Task("test task3", "test description3", TaskStatus.DONE, 15, startTime.plusHours(2));
         taskManager.addTask(task3);
         Epic epic2 = new Epic("test epic2", "test description2");
-        taskManager.addEpic(epic2);
+        taskManager.addTask(epic2);
         Subtask subtask2 = new Subtask("test subtask2", "test description2", epic2.getId(), TaskStatus.IN_PROGRESS, 15, startTime.plusHours(3));
-        taskManager.addSubtask(subtask2);
+        taskManager.addTask(subtask2);
         Subtask subtask3 = new Subtask("test subtask3", "test description3", epic2.getId(), TaskStatus.DONE, 15, startTime.plusHours(4));
-        taskManager.addSubtask(subtask3);
+        taskManager.addTask(subtask3);
 
         Assertions.assertDoesNotThrow(() -> FileBackedTaskManager.loadFromFile(file), "Загрузка задач из файла не должна приводить к исключениям");
         TaskManager taskManagerFromFile = FileBackedTaskManager.loadFromFile(file);

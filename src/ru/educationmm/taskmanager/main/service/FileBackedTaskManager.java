@@ -8,6 +8,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
+import static ru.educationmm.taskmanager.main.httpserver.util.LocalDateTimeAdapter.DATE_TIME_FORMATTER;
+
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private static final String HEADER = "id,type,name,status,description,epic,duration,startTime";
@@ -19,7 +21,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         this.file = file;
     }
 
-    public static FileBackedTaskManager loadFromFile(File file) {
+    public static FileBackedTaskManager loadFromFile(File file) throws IllegalArgumentException {
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
         int latestTaskId = 0;
         String taskEntry = "";
@@ -81,7 +83,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             startTime = null;
         } else {
             try {
-                startTime = LocalDateTime.parse(taskFields[7], Task.DATE_TIME_FORMATTER);
+                startTime = LocalDateTime.parse(taskFields[7], DATE_TIME_FORMATTER);
             } catch (DateTimeParseException e) {
                 throw new IllegalArgumentException("Некорректный формат startTime в строке: " + value, e);
             }
@@ -104,7 +106,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return null;
     }
 
-    public void save() {
+    public void save() throws ManagerSaveException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
             writer.write(HEADER + NEW_LINE);
 
@@ -126,9 +128,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     // ADD
     @Override
-    public void addTask(Task task) {
-        super.addTask(task);
+    public Task addTask(Task task) throws ManagerSaveException {
+        Task task1 = super.addTask(task);
         save();
+        return task1;
     }
 
     private void addTaskToMemory(Task task) {
@@ -136,78 +139,80 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void addEpic(Epic epic) {
-        super.addEpic(epic);
+    public Epic addTask(Epic epic) throws ManagerSaveException {
+        Epic epic1 = super.addTask(epic);
         save();
+        return epic1;
     }
 
     private void addEpicToMemory(Epic epic) {
-        super.addEpic(epic);
+        super.addTask(epic);
     }
 
     @Override
-    public void addSubtask(Subtask subtask) {
-        super.addSubtask(subtask);
+    public Subtask addTask(Subtask subtask) throws ManagerSaveException {
+        Subtask subtask1 = super.addTask(subtask);
         save();
+        return subtask1;
     }
 
     private void addSubtaskToMemory(Subtask subtask) {
-        super.addSubtask(subtask);
+        super.addTask(subtask);
     }
 
     // DELETE ALL
     @Override
-    public void deleteAllTasks() {
+    public void deleteAllTasks() throws ManagerSaveException {
         super.deleteAllTasks();
         save();
     }
 
     @Override
-    public void deleteAllEpics() {
+    public void deleteAllEpics() throws ManagerSaveException {
         super.deleteAllEpics();
         save();
     }
 
     @Override
-    public void deleteAllSubtasks() {
+    public void deleteAllSubtasks() throws ManagerSaveException {
         super.deleteAllSubtasks();
         save();
     }
 
     // UPDATE
     @Override
-    public void updateTask(Task task) {
+    public void updateTask(Task task) throws ManagerSaveException {
         super.updateTask(task);
         save();
     }
 
     @Override
-    public void updateEpic(Epic epic) {
-        super.updateEpic(epic);
+    public void updateTask(Epic epic) throws ManagerSaveException {
+        super.updateTask(epic);
         save();
     }
 
     @Override
-    public void updateSubtask(Subtask subtask) {
-        super.updateSubtask(subtask);
+    public void updateTask(Subtask subtask) throws ManagerSaveException {
+        super.updateTask(subtask);
         save();
     }
 
     // DELETE BY ID
     @Override
-    public void deleteTaskById(int taskId) {
+    public void deleteTaskById(int taskId) throws ManagerSaveException {
         super.deleteTaskById(taskId);
         save();
     }
 
     @Override
-    public void deleteEpicById(int epicId) {
+    public void deleteEpicById(int epicId) throws ManagerSaveException {
         super.deleteEpicById(epicId);
         save();
     }
 
     @Override
-    public void deleteSubtaskById(int subtaskId) {
+    public void deleteSubtaskById(int subtaskId) throws ManagerSaveException {
         super.deleteSubtaskById(subtaskId);
         save();
     }
