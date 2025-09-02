@@ -46,7 +46,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // ADD
     @Override
-    public Task addTask(Task task) throws TaskOverlapException {
+    public Task addTask(Task task) {
         Optional<Task> intersectingTask = prioritized.checkExistingIntersections(task);
         if (intersectingTask.isPresent()) {
             throw new TaskOverlapException("Ошибка добавления задачи. Задача пересекается по времени с задачей id:" + intersectingTask.get().getId());
@@ -78,7 +78,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Subtask addTask(Subtask subtask) throws TaskOverlapException, NotFoundException {
+    public Subtask addTask(Subtask subtask) {
         Optional<Task> intersectingTask = prioritized.checkExistingIntersections(subtask);
         if (intersectingTask.isPresent()) {
             throw new TaskOverlapException("Ошибка добавления подзадачи. Подзадача пересекается по времени с задачей id:" + intersectingTask.get().getId());
@@ -139,7 +139,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // GET BY ID
     @Override
-    public Task getTaskById(int taskId) throws NotFoundException {
+    public Task getTaskById(int taskId) {
         Task task = tasks.get(taskId);
         if (task == null) {
             throw new NotFoundException("Задача не найдена");
@@ -149,7 +149,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Epic getEpicById(int epicId) throws NotFoundException {
+    public Epic getEpicById(int epicId) {
         Epic epic = epics.get(epicId);
         if (epic == null) {
             throw new NotFoundException("Эпик не найден");
@@ -159,7 +159,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Subtask getSubtaskById(int subtaskId) throws NotFoundException {
+    public Subtask getSubtaskById(int subtaskId) {
         Subtask subtask = subtasks.get(subtaskId);
         if (subtask == null) {
             throw new NotFoundException("Эпик не найден");
@@ -170,7 +170,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // UPDATE
     @Override
-    public void updateTask(Task task) throws TaskOverlapException, NotFoundException {
+    public void updateTask(Task task) {
         if (!tasks.containsKey(task.getId())) {
             throw new NotFoundException("Ошибка обновления задачи. Задачи нет в менеджере");
         } else {
@@ -185,7 +185,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateTask(Epic epic) throws NotFoundException {
+    public void updateTask(Epic epic) {
         if (!epics.containsKey(epic.getId())) {
             throw new NotFoundException("Ошибка обновления эпика. Эпика нет в менеджере");
         }
@@ -194,7 +194,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateTask(Subtask subtask) throws TaskOverlapException, NotFoundException {
+    public void updateTask(Subtask subtask) {
         if (!subtasks.containsKey(subtask.getId())) {
             throw new NotFoundException("Ошибка обновления подзадачи. Подзадачи нет в менеджере");
         } else {
@@ -212,7 +212,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // DELETE BY ID
     @Override
-    public void deleteTaskById(int taskId) throws NotFoundException {
+    public void deleteTaskById(int taskId) {
         if (!tasks.containsKey(taskId)) {
             throw new NotFoundException("Ошибка удаления задачи. Задача отсутствует в менеджере");
         }
@@ -223,7 +223,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void deleteEpicById(int epicId) throws NotFoundException {
+    public void deleteEpicById(int epicId) {
         if (!epics.containsKey(epicId)) {
             throw new NotFoundException("Ошибка удаления эпика. Эпик отсутствует в менеджере");
         }
@@ -237,7 +237,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void deleteSubtaskById(int subtaskId) throws NotFoundException {
+    public void deleteSubtaskById(int subtaskId) {
         if (!subtasks.containsKey(subtaskId)) {
             throw new NotFoundException("Ошибка удаления подзадачи. Подзадача отсутствует в менеджере");
         }
@@ -252,7 +252,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // EPIC SUBTASKS
     @Override
-    public List<Subtask> getEpicSubtasks(int epicId) throws NotFoundException {
+    public List<Subtask> getEpicSubtasks(int epicId) {
         if (!epics.containsKey(epicId)) {
             throw new NotFoundException("Ошибка. Эпик отсутствует в менеджере");
         }

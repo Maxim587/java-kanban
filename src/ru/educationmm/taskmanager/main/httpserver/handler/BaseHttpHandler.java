@@ -37,10 +37,22 @@ public class BaseHttpHandler {
         return gson;
     }
 
-    protected void handleTaskRequests(HttpExchange exchange, TaskType taskType) throws IOException {
+    protected void handleTaskRequests(HttpExchange exchange) throws IOException {
         if (!checkTaskId(exchange)) {
             sendNotFound(exchange);
             return;
+        }
+
+        String endpoint = getPathParts(exchange)[1];
+        TaskType taskType;
+        switch (endpoint) {
+            case "tasks" -> taskType = TaskType.TASK;
+            case "epics" -> taskType = TaskType.EPIC;
+            case "subtasks" -> taskType = TaskType.SUBTASK;
+            default -> {
+                sendNotFound(exchange);
+                return;
+            }
         }
 
         try {
@@ -62,7 +74,7 @@ public class BaseHttpHandler {
         }
     }
 
-    private void handleTaskGetMethods(HttpExchange exchange, TaskType taskType) throws IOException, NotFoundException {
+    private void handleTaskGetMethods(HttpExchange exchange, TaskType taskType) throws IOException {
         String[] pathParts = getPathParts(exchange);
         Optional<Integer> taskIdOpt = getTaskId(pathParts);
 
@@ -88,9 +100,7 @@ public class BaseHttpHandler {
         }
     }
 
-    private void handleTaskPostMethods(HttpExchange exchange, TaskType taskType)
-            throws IOException, TaskOverlapException, NotFoundException, ManagerSaveException,
-            JsonSyntaxException, IllegalArgumentException {
+    private void handleTaskPostMethods(HttpExchange exchange, TaskType taskType) throws IOException {
 
         InputStream inputStream = exchange.getRequestBody();
         String requestBody = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
@@ -125,7 +135,7 @@ public class BaseHttpHandler {
         }
     }
 
-    private void handleTaskDeleteMethods(HttpExchange exchange, TaskType taskType) throws IOException, NotFoundException, ManagerSaveException {
+    private void handleTaskDeleteMethods(HttpExchange exchange, TaskType taskType) throws IOException {
         Optional<Integer> taskIdOpt = getTaskId(getPathParts(exchange));
         if (taskIdOpt.isEmpty()) {
             sendNotFound(exchange);
@@ -148,7 +158,7 @@ public class BaseHttpHandler {
         sendText(exchange, gson.toJson(taskManager.getPrioritizedTasks()), 200);
     }
 
-    private String addTask(JsonElement jsonElement, TaskType taskType) throws JsonSyntaxException {
+    private String addTask(JsonElement jsonElement, TaskType taskType) {
         return switch (taskType) {
             case TASK -> gson.toJson(taskManager.addTask(gson.fromJson(jsonElement, Task.class)));
             case EPIC -> {
@@ -159,7 +169,7 @@ public class BaseHttpHandler {
         };
     }
 
-    private void updateTask(JsonElement jsonElement, TaskType taskType) throws JsonSyntaxException {
+    private void updateTask(JsonElement jsonElement, TaskType taskType) {
         switch (taskType) {
             case TASK -> taskManager.updateTask(gson.fromJson(jsonElement, Task.class));
             case SUBTASK -> taskManager.updateTask(gson.fromJson(jsonElement, Subtask.class));

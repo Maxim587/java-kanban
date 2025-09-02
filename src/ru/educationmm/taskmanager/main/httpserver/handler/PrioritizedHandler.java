@@ -1,25 +1,17 @@
 package ru.educationmm.taskmanager.main.httpserver.handler;
 
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
 
-public class PrioritizedHandler implements HttpHandler {
-
-    private final BaseHttpHandler baseHttpHandler;
+public class PrioritizedHandler extends AbstractHandler {
 
     public PrioritizedHandler(BaseHttpHandler baseHttpHandler) {
-        this.baseHttpHandler = baseHttpHandler;
+        super(baseHttpHandler);
     }
 
     @Override
-    public void handle(HttpExchange exchange) {
-        try {
-            baseHttpHandler.handlePrioritizedRequest(exchange);
-        } catch (IOException e) {
-            System.out.println("Ошибка обработки запроса " + exchange.getRequestURI().getPath());
-            e.printStackTrace();
-        }
+    protected void handleRequests(HttpExchange exchange) throws IOException {
+        baseHttpHandler.handlePrioritizedRequest(exchange);
     }
 }

@@ -21,7 +21,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         this.file = file;
     }
 
-    public static FileBackedTaskManager loadFromFile(File file) throws IllegalArgumentException {
+    public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
         int latestTaskId = 0;
         String taskEntry = "";
@@ -57,7 +57,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return fileBackedTaskManager;
     }
 
-    public static Task fromString(String value) throws IllegalArgumentException {
+    public static Task fromString(String value) {
         String[] taskFields = value.split(",", -1);
         int properNumberOfColumnsInFile = 8;
 
@@ -106,7 +106,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return null;
     }
 
-    public void save() throws ManagerSaveException {
+    public void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
             writer.write(HEADER + NEW_LINE);
 
@@ -128,7 +128,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     // ADD
     @Override
-    public Task addTask(Task task) throws ManagerSaveException {
+    public Task addTask(Task task) {
         Task task1 = super.addTask(task);
         save();
         return task1;
@@ -139,7 +139,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Epic addTask(Epic epic) throws ManagerSaveException {
+    public Epic addTask(Epic epic) {
         Epic epic1 = super.addTask(epic);
         save();
         return epic1;
@@ -150,7 +150,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Subtask addTask(Subtask subtask) throws ManagerSaveException {
+    public Subtask addTask(Subtask subtask) {
         Subtask subtask1 = super.addTask(subtask);
         save();
         return subtask1;
@@ -162,57 +162,57 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     // DELETE ALL
     @Override
-    public void deleteAllTasks() throws ManagerSaveException {
+    public void deleteAllTasks() {
         super.deleteAllTasks();
         save();
     }
 
     @Override
-    public void deleteAllEpics() throws ManagerSaveException {
+    public void deleteAllEpics() {
         super.deleteAllEpics();
         save();
     }
 
     @Override
-    public void deleteAllSubtasks() throws ManagerSaveException {
+    public void deleteAllSubtasks() {
         super.deleteAllSubtasks();
         save();
     }
 
     // UPDATE
     @Override
-    public void updateTask(Task task) throws ManagerSaveException {
+    public void updateTask(Task task) {
         super.updateTask(task);
         save();
     }
 
     @Override
-    public void updateTask(Epic epic) throws ManagerSaveException {
+    public void updateTask(Epic epic) {
         super.updateTask(epic);
         save();
     }
 
     @Override
-    public void updateTask(Subtask subtask) throws ManagerSaveException {
+    public void updateTask(Subtask subtask) {
         super.updateTask(subtask);
         save();
     }
 
     // DELETE BY ID
     @Override
-    public void deleteTaskById(int taskId) throws ManagerSaveException {
+    public void deleteTaskById(int taskId) {
         super.deleteTaskById(taskId);
         save();
     }
 
     @Override
-    public void deleteEpicById(int epicId) throws ManagerSaveException {
+    public void deleteEpicById(int epicId) {
         super.deleteEpicById(epicId);
         save();
     }
 
     @Override
-    public void deleteSubtaskById(int subtaskId) throws ManagerSaveException {
+    public void deleteSubtaskById(int subtaskId) {
         super.deleteSubtaskById(subtaskId);
         save();
     }
