@@ -5,14 +5,14 @@ import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
 
-abstract public class AbstractHandler implements HttpHandler {
+abstract class AbstractHandler implements HttpHandler {
     protected final BaseHttpHandler baseHttpHandler;
 
     public AbstractHandler(BaseHttpHandler baseHttpHandler) {
         this.baseHttpHandler = baseHttpHandler;
     }
 
-    abstract protected void handleRequests(HttpExchange exchange) throws IOException;
+    protected abstract void handleRequests(HttpExchange exchange) throws IOException;
 
 
     @Override
