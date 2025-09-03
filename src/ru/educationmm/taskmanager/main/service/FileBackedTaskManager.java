@@ -8,6 +8,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
+import static ru.educationmm.taskmanager.main.httpserver.util.LocalDateTimeAdapter.DATE_TIME_FORMATTER;
+
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private static final String HEADER = "id,type,name,status,description,epic,duration,startTime";
@@ -55,7 +57,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return fileBackedTaskManager;
     }
 
-    public static Task fromString(String value) throws IllegalArgumentException {
+    public static Task fromString(String value) {
         String[] taskFields = value.split(",", -1);
         int properNumberOfColumnsInFile = 8;
 
@@ -81,7 +83,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             startTime = null;
         } else {
             try {
-                startTime = LocalDateTime.parse(taskFields[7], Task.DATE_TIME_FORMATTER);
+                startTime = LocalDateTime.parse(taskFields[7], DATE_TIME_FORMATTER);
             } catch (DateTimeParseException e) {
                 throw new IllegalArgumentException("Некорректный формат startTime в строке: " + value, e);
             }
@@ -126,9 +128,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     // ADD
     @Override
-    public void addTask(Task task) {
-        super.addTask(task);
+    public Task addTask(Task task) {
+        Task task1 = super.addTask(task);
         save();
+        return task1;
     }
 
     private void addTaskToMemory(Task task) {
@@ -136,23 +139,25 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void addEpic(Epic epic) {
-        super.addEpic(epic);
+    public Epic addTask(Epic epic) {
+        Epic epic1 = super.addTask(epic);
         save();
+        return epic1;
     }
 
     private void addEpicToMemory(Epic epic) {
-        super.addEpic(epic);
+        super.addTask(epic);
     }
 
     @Override
-    public void addSubtask(Subtask subtask) {
-        super.addSubtask(subtask);
+    public Subtask addTask(Subtask subtask) {
+        Subtask subtask1 = super.addTask(subtask);
         save();
+        return subtask1;
     }
 
     private void addSubtaskToMemory(Subtask subtask) {
-        super.addSubtask(subtask);
+        super.addTask(subtask);
     }
 
     // DELETE ALL
@@ -182,14 +187,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void updateEpic(Epic epic) {
-        super.updateEpic(epic);
+    public void updateTask(Epic epic) {
+        super.updateTask(epic);
         save();
     }
 
     @Override
-    public void updateSubtask(Subtask subtask) {
-        super.updateSubtask(subtask);
+    public void updateTask(Subtask subtask) {
+        super.updateTask(subtask);
         save();
     }
 

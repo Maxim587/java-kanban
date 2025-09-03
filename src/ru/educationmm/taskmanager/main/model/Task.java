@@ -2,8 +2,10 @@ package ru.educationmm.taskmanager.main.model;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+
+import static ru.educationmm.taskmanager.main.httpserver.util.LocalDateTimeAdapter.DATE_TIME_FORMATTER;
 
 public class Task {
     private int id;
@@ -12,7 +14,6 @@ public class Task {
     private TaskStatus status;
     private Duration duration;
     private LocalDateTime startTime;
-    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
     public Task(String name, String description, TaskStatus status, long durationInMinutes, LocalDateTime startTime) {
         this.name = name;
@@ -22,16 +23,14 @@ public class Task {
             throw new IllegalArgumentException(String.format("Некорректное значение durationInMinutes [%d]", durationInMinutes));
         }
         this.duration = Duration.ofMinutes(durationInMinutes);
-        this.startTime = startTime;
+        if (startTime != null) {
+            this.startTime = startTime.truncatedTo(ChronoUnit.SECONDS);
+        }
     }
 
     public Task(Task task) {
+        this(task.getName(), task.getDescription(), task.getStatus(), task.getDuration().toMinutes(), task.getStartTime());
         this.id = task.getId();
-        this.name = task.getName();
-        this.description = task.getDescription();
-        this.status = task.getStatus();
-        this.duration = task.getDuration();
-        this.startTime = task.getStartTime();
     }
 
     public int getId() {
@@ -83,7 +82,7 @@ public class Task {
     }
 
     public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
+        this.startTime = startTime.truncatedTo(ChronoUnit.SECONDS);
     }
 
     public LocalDateTime getEndTime() {

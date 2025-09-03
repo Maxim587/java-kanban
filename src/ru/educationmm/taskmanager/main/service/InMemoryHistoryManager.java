@@ -1,11 +1,11 @@
 package ru.educationmm.taskmanager.main.service;
 
+import ru.educationmm.taskmanager.main.model.Task;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-
-import ru.educationmm.taskmanager.main.model.Task;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private final Map<Integer, Node> history;
@@ -17,18 +17,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         head = new Node(null, null, null);
         tail = new Node(null, head, null);
         head.next = tail;
-    }
-
-    private static class Node {
-        private final Task data;
-        private Node prev;
-        private Node next;
-
-        private Node(Task data, Node prev, Node next) {
-            this.data = data;
-            this.prev = prev;
-            this.next = next;
-        }
     }
 
     private Node linkLast(Task task) {
@@ -68,5 +56,17 @@ public class InMemoryHistoryManager implements HistoryManager {
     private void removeNode(Node node) {
         node.next.prev = node.prev;
         node.prev.next = node.next;
+    }
+
+    private static class Node {
+        private final Task data;
+        private Node prev;
+        private Node next;
+
+        private Node(Task data, Node prev, Node next) {
+            this.data = data;
+            this.prev = prev;
+            this.next = next;
+        }
     }
 }

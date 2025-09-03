@@ -1,7 +1,6 @@
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions;
-
 import ru.educationmm.taskmanager.main.model.Epic;
 import ru.educationmm.taskmanager.main.model.Subtask;
 import ru.educationmm.taskmanager.main.model.TaskStatus;
@@ -12,8 +11,8 @@ import java.time.Month;
 
 class EpicTest {
 
-    Epic epic1;
     public LocalDateTime startTime = LocalDateTime.of(2025, Month.JUNE, 15, 10, 50);
+    Epic epic1;
 
     @BeforeEach
     public void prepare() {

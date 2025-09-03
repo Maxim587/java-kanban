@@ -1,16 +1,16 @@
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.educationmm.taskmanager.main.model.*;
+import ru.educationmm.taskmanager.main.model.Epic;
+import ru.educationmm.taskmanager.main.model.Subtask;
+import ru.educationmm.taskmanager.main.model.Task;
+import ru.educationmm.taskmanager.main.model.TaskStatus;
 import ru.educationmm.taskmanager.main.service.TaskManager;
-import ru.educationmm.taskmanager.main.service.TimePrioritized;
 
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.Arrays;
-import java.util.List;
 
-public abstract class TaskManagerTest<T extends TaskManager & TimePrioritized> {
+public abstract class TaskManagerTest<T extends TaskManager> {
 
     protected T taskManager;
     protected Task task;
@@ -26,9 +26,9 @@ public abstract class TaskManagerTest<T extends TaskManager & TimePrioritized> {
         task = new Task("test task", "test description", TaskStatus.NEW, 20, startTime);
         taskManager.addTask(task);
         epic = new Epic("test epic", "test description");
-        taskManager.addEpic(epic);
+        taskManager.addTask(epic);
         subtask = new Subtask("test subtask", "test description", epic.getId(), TaskStatus.NEW, 25, startTime.plusMinutes(30));
-        taskManager.addSubtask(subtask);
+        taskManager.addTask(subtask);
     }
 
     @Test
@@ -47,7 +47,7 @@ public abstract class TaskManagerTest<T extends TaskManager & TimePrioritized> {
 
     @Test
     public void subtaskShouldBeAddedToEpic() {
-        Assertions.assertEquals(subtask, taskManager.getEpicById(epic.getId()).orElseThrow().getEpicSubtasks().getFirst(),
+        Assertions.assertEquals(subtask, taskManager.getEpicById(epic.getId()).getEpicSubtasks().getFirst(),
                 "Подзадача не добавлена в эпик");
     }
 
@@ -60,52 +60,52 @@ public abstract class TaskManagerTest<T extends TaskManager & TimePrioritized> {
 
     @Test
     public void taskShouldNotBeChangedWhenAddedToManager() {
-        Assertions.assertEquals(task.getId(), taskManager.getTaskById(1).orElseThrow().getId(), "Id задач " +
+        Assertions.assertEquals(task.getId(), taskManager.getTaskById(1).getId(), "Id задач " +
                 "не совпадают");
-        Assertions.assertEquals(epic.getId(), taskManager.getEpicById(2).orElseThrow().getId(), "Id эпиков " +
+        Assertions.assertEquals(epic.getId(), taskManager.getEpicById(2).getId(), "Id эпиков " +
                 "не совпадают");
-        Assertions.assertEquals(subtask.getId(), taskManager.getSubtaskById(3).orElseThrow().getId(), "Id подзадач " +
+        Assertions.assertEquals(subtask.getId(), taskManager.getSubtaskById(3).getId(), "Id подзадач " +
                 "не совпадают");
 
-        Assertions.assertEquals(task.getName(), taskManager.getTaskById(1).orElseThrow().getName(), "Имена задач " +
+        Assertions.assertEquals(task.getName(), taskManager.getTaskById(1).getName(), "Имена задач " +
                 "не совпадают");
-        Assertions.assertEquals(epic.getName(), taskManager.getEpicById(2).orElseThrow().getName(), "Имена эпиков " +
+        Assertions.assertEquals(epic.getName(), taskManager.getEpicById(2).getName(), "Имена эпиков " +
                 "не совпадают");
-        Assertions.assertEquals(subtask.getName(), taskManager.getSubtaskById(3).orElseThrow().getName(), "Имена " +
+        Assertions.assertEquals(subtask.getName(), taskManager.getSubtaskById(3).getName(), "Имена " +
                 "подзадач не совпадают");
 
-        Assertions.assertEquals(task.getDescription(), taskManager.getTaskById(1).orElseThrow().getDescription(),
+        Assertions.assertEquals(task.getDescription(), taskManager.getTaskById(1).getDescription(),
                 "Описания задач не совпадают");
-        Assertions.assertEquals(epic.getDescription(), taskManager.getEpicById(2).orElseThrow().getDescription(),
+        Assertions.assertEquals(epic.getDescription(), taskManager.getEpicById(2).getDescription(),
                 "Описания эпиков не совпадают");
-        Assertions.assertEquals(subtask.getDescription(), taskManager.getSubtaskById(3).orElseThrow().getDescription(),
+        Assertions.assertEquals(subtask.getDescription(), taskManager.getSubtaskById(3).getDescription(),
                 "Описания подзадач не совпадают");
 
-        Assertions.assertEquals(task.getStatus(), taskManager.getTaskById(1).orElseThrow().getStatus(), "Статусы " +
+        Assertions.assertEquals(task.getStatus(), taskManager.getTaskById(1).getStatus(), "Статусы " +
                 "задач не совпадают");
-        Assertions.assertEquals(epic.getStatus(), taskManager.getEpicById(2).orElseThrow().getStatus(), "Статусы " +
+        Assertions.assertEquals(epic.getStatus(), taskManager.getEpicById(2).getStatus(), "Статусы " +
                 "эпиков не совпадают");
-        Assertions.assertEquals(subtask.getStatus(), taskManager.getSubtaskById(3).orElseThrow().getStatus(),
+        Assertions.assertEquals(subtask.getStatus(), taskManager.getSubtaskById(3).getStatus(),
                 "Статусы подзадач не совпадают");
 
-        Assertions.assertEquals(epic.getEpicSubtasks(), taskManager.getEpicById(2).orElseThrow().getEpicSubtasks(),
+        Assertions.assertEquals(epic.getEpicSubtasks(), taskManager.getEpicById(2).getEpicSubtasks(),
                 "Списки подзадач эпика не совпадают");
 
-        Assertions.assertEquals(subtask.getEpicId(), taskManager.getSubtaskById(3).orElseThrow().getEpicId(),
+        Assertions.assertEquals(subtask.getEpicId(), taskManager.getSubtaskById(3).getEpicId(),
                 "Id эпиков подзадач не совпадают");
 
-        Assertions.assertEquals(task.getDuration(), taskManager.getTaskById(1).orElseThrow().getDuration(), "Продолжительность задач " +
+        Assertions.assertEquals(task.getDuration(), taskManager.getTaskById(1).getDuration(), "Продолжительность задач " +
                 "не совпадает");
-        Assertions.assertEquals(epic.getDuration(), taskManager.getEpicById(2).orElseThrow().getDuration(), "Продолжительность эпиков " +
+        Assertions.assertEquals(epic.getDuration(), taskManager.getEpicById(2).getDuration(), "Продолжительность эпиков " +
                 "не совпадает");
-        Assertions.assertEquals(subtask.getDuration(), taskManager.getSubtaskById(3).orElseThrow().getDuration(), "Продолжительность подзадач " +
+        Assertions.assertEquals(subtask.getDuration(), taskManager.getSubtaskById(3).getDuration(), "Продолжительность подзадач " +
                 "не совпадает");
 
-        Assertions.assertEquals(task.getStartTime(), taskManager.getTaskById(1).orElseThrow().getStartTime(), "Время начала задач " +
+        Assertions.assertEquals(task.getStartTime(), taskManager.getTaskById(1).getStartTime(), "Время начала задач " +
                 "не совпадает");
-        Assertions.assertEquals(epic.getStartTime(), taskManager.getEpicById(2).orElseThrow().getStartTime(), "Время начала эпиков " +
+        Assertions.assertEquals(epic.getStartTime(), taskManager.getEpicById(2).getStartTime(), "Время начала эпиков " +
                 "не совпадает");
-        Assertions.assertEquals(subtask.getStartTime(), taskManager.getSubtaskById(3).orElseThrow().getStartTime(), "Время начала подзадач " +
+        Assertions.assertEquals(subtask.getStartTime(), taskManager.getSubtaskById(3).getStartTime(), "Время начала подзадач " +
                 "не совпадает");
     }
 
@@ -128,10 +128,10 @@ public abstract class TaskManagerTest<T extends TaskManager & TimePrioritized> {
     @Test
     public void epicShouldNotContainDeletedSubtasks() {
         Subtask subtask1 = new Subtask("st", "desc", epic.getId(), TaskStatus.NEW, 15, startTime.plusHours(1));
-        taskManager.addSubtask(subtask1);
+        taskManager.addTask(subtask1);
         int subtaskId = subtask1.getId();
         taskManager.deleteSubtaskById(subtaskId);
-        taskManager.getEpicById(epic.getId()).orElseThrow().getEpicSubtasks().forEach(st ->
+        taskManager.getEpicById(epic.getId()).getEpicSubtasks().forEach(st ->
                 Assertions.assertNotEquals(subtaskId, st.getId(), "Подзадача не удалена из эпика"));
         taskManager.deleteAllSubtasks();
         Assertions.assertEquals(0, taskManager.getEpicSubtasks(epic.getId()).size(), "Подзадачи " +
@@ -157,12 +157,12 @@ public abstract class TaskManagerTest<T extends TaskManager & TimePrioritized> {
         epicUpdated.addSubtaskToEpic(subtaskUpdated);
 
         taskManager.updateTask(taskUpdated);
-        taskManager.updateEpic(epicUpdated);
-        taskManager.updateSubtask(subtaskUpdated);
+        taskManager.updateTask(epicUpdated);
+        taskManager.updateTask(subtaskUpdated);
 
-        Task taskToCompare = taskManager.getTaskById(task.getId()).orElseThrow();
-        Epic epicToCompare = taskManager.getEpicById(epic.getId()).orElseThrow();
-        Subtask subtaskToCompare = taskManager.getSubtaskById(subtask.getId()).orElseThrow();
+        Task taskToCompare = taskManager.getTaskById(task.getId());
+        Epic epicToCompare = taskManager.getEpicById(epic.getId());
+        Subtask subtaskToCompare = taskManager.getSubtaskById(subtask.getId());
 
         Assertions.assertEquals("updated", taskToCompare.getName(), "Название задачи не обновлено");
         Assertions.assertEquals("updated", taskToCompare.getDescription(), "Описание задачи не обновлено");
@@ -179,62 +179,12 @@ public abstract class TaskManagerTest<T extends TaskManager & TimePrioritized> {
     }
 
     @Test
-    void subtasksShouldHaveEpicIds() {
+    public void subtasksShouldHaveEpicIds() {
         Subtask subtask1 = new Subtask("subtask1", "description", 1, TaskStatus.NEW, 30, startTime);
         Subtask subtask2 = new Subtask("subtask2", "description", 1, TaskStatus.NEW, 30, startTime.plusHours(1));
         subtask1.setId(4);
         subtask2.setId(5);
         boolean isEpicIdNotSet = taskManager.getSubtasks().stream().anyMatch(subtask -> subtask.getEpicId() <= 0);
         Assertions.assertFalse(isEpicIdNotSet, "Подзадача должна содержать epicId");
-    }
-
-    @Test
-    public void prioritizedTaskListShouldContainTaskOrderedByStartTime() {
-        Task taskBefore = new Task("task before", "", TaskStatus.NEW, 2, startTime.minusMinutes(20));
-        Task taskBetween = new Task("task between", "", TaskStatus.NEW, 1, task.getEndTime().plusMinutes(2));
-        taskManager.addTask(taskBefore);
-        taskManager.addTask(taskBetween);
-        List<Task> target = Arrays.asList(taskBefore, task, taskBetween, subtask);
-        Assertions.assertIterableEquals(taskManager.getPrioritizedTasks(), target, "Задачи не отсортированы по времени");
-    }
-
-    @Test
-    public void checkExistingIntersections() {
-        Task task0 = new Task(task);
-        task0.setId(6);
-        Task task1 = new Task("not intersecting task", "", TaskStatus.NEW, 1, startTime.plusHours(1));
-        task1.setId(4);
-        Task task2 = new Task("intersecting task", "", TaskStatus.NEW, 20, startTime.plusMinutes(10));
-        task2.setId(5);
-        Assertions.assertTrue(taskManager.checkExistingIntersections(task0), "Должно быть выявлено пересечение задач");
-        Assertions.assertFalse(taskManager.checkExistingIntersections(task1), "Должно быть выявлено отсутствие пересечения задач");
-        Assertions.assertTrue(taskManager.checkExistingIntersections(task2), "Должно быть выявлено пересечение задач");
-    }
-
-    @Test
-    public void isIntersectingTasks() {
-        //Пересекающиеся задачи, у которых совпадает время старта и время окончания
-        Task task2 = new Task(task);
-        Assertions.assertTrue(taskManager.isIntersectingTasks(task, task2), "Должно быть выявлено пересечение задач");
-
-        //Пересекающиеся задачи, у которых отличается время старта и время окончания
-        task2 = new Task("task2", "task2", TaskStatus.NEW, 30, startTime.plusMinutes(10));
-        Assertions.assertTrue(taskManager.isIntersectingTasks(task, task2), "Должно быть выявлено пересечение задач");
-
-        //Пересекающиеся задачи, у которых совпадает время старта и отличается время окончания
-        task2 = new Task("task2", "task2", TaskStatus.NEW, 30, startTime);
-        Assertions.assertTrue(taskManager.isIntersectingTasks(task, task2), "Должно быть выявлено пересечение задач");
-
-        //Пересекающиеся задачи, у которых отличается время старта и совпадает время окончания
-        task2 = new Task("task2", "task2", TaskStatus.NEW, 15, startTime.plusMinutes(5));
-        Assertions.assertTrue(taskManager.isIntersectingTasks(task, task2), "Должно быть выявлено пересечение задач");
-
-        //Пересекающиеся задачи, у которых время окончания первой задачи совпадает с временем начала второй
-        task2 = new Task("task2", "task2", TaskStatus.NEW, 30, task.getEndTime());
-        Assertions.assertTrue(taskManager.isIntersectingTasks(task, task2), "Должно быть выявлено пересечение задач");
-
-        //Непересекающиеся задачи
-        task2 = new Task("task2", "task2", TaskStatus.NEW, 30, task.getEndTime().plusMinutes(5));
-        Assertions.assertFalse(taskManager.isIntersectingTasks(task, task2), "Должно быть выявлено отсутствие пересечения задач");
     }
 }

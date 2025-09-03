@@ -1,8 +1,10 @@
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import ru.educationmm.taskmanager.main.model.*;
+import ru.educationmm.taskmanager.main.model.Epic;
+import ru.educationmm.taskmanager.main.model.Subtask;
+import ru.educationmm.taskmanager.main.model.Task;
+import ru.educationmm.taskmanager.main.model.TaskStatus;
 import ru.educationmm.taskmanager.main.service.InMemoryHistoryManager;
 import ru.educationmm.taskmanager.main.service.InMemoryTaskManager;
 import ru.educationmm.taskmanager.main.service.TaskManager;
@@ -13,9 +15,9 @@ import java.time.Month;
 
 class InMemoryHistoryManagerTest {
 
+    public LocalDateTime startTime = LocalDateTime.of(2025, Month.JUNE, 15, 10, 50);
     TaskManager taskManager;
     Task task;
-    public LocalDateTime startTime = LocalDateTime.of(2025, Month.JUNE, 15, 10, 50);
 
     @BeforeEach
     public void prepare() {
@@ -35,16 +37,16 @@ class InMemoryHistoryManagerTest {
     public void addAndDeleteTasks() {
         Epic epic = new Epic("test", "test");
         taskManager.addTask(task);
-        taskManager.addEpic(epic);
+        taskManager.addTask(epic);
         Subtask subtask = new Subtask("test", "test", epic.getId(), TaskStatus.NEW, 15, startTime.plusHours(1));
-        taskManager.addSubtask(subtask);
+        taskManager.addTask(subtask);
 
         taskManager.getTaskById(task.getId());
         Assertions.assertEquals(1, taskManager.getHistory().size(), "После просмотра задачи, история не должна быть пустой.");
 
         taskManager.deleteTaskById(task.getId());
         Assertions.assertEquals(0, taskManager.getHistory().size(), "При удалении задачи она должна удаляться из истории");
-
+        taskManager.addTask(task);
         taskManager.getTaskById(task.getId());
         taskManager.deleteAllTasks();
         Assertions.assertEquals(0, taskManager.getHistory().size(), "При удалении всех задач они должны удаляться из истории");
@@ -56,21 +58,22 @@ class InMemoryHistoryManagerTest {
         Assertions.assertEquals(2, taskManager.getHistory().size(), "После просмотра подзадачи она должна появиться в истории просмотра.");
         taskManager.deleteEpicById(epic.getId());
         Assertions.assertEquals(0, taskManager.getHistory().size(), "При удалении эпика, он и его подзадачи должны удаляться из истории");
-
+        taskManager.addTask(epic);
         taskManager.getEpicById(epic.getId());
+        taskManager.addTask(subtask);
         taskManager.getSubtaskById(subtask.getId());
         taskManager.deleteAllEpics();
         Assertions.assertEquals(0, taskManager.getHistory().size(), "При удалении всех эпиков, все эпики и их подзадачи должны удаляться из истории");
 
-        taskManager.addEpic(epic);
+        taskManager.addTask(epic);
         subtask = new Subtask("test", "test", epic.getId(), TaskStatus.NEW, 15, startTime);
-        taskManager.addSubtask(subtask);
+        taskManager.addTask(subtask);
         taskManager.getSubtaskById(subtask.getId());
         Assertions.assertEquals(1, taskManager.getHistory().size(), "После просмотра подзадачи, история не должна быть пустой.");
 
         taskManager.deleteSubtaskById(subtask.getId());
         Assertions.assertEquals(0, taskManager.getHistory().size(), "При удалении подзадачи она должна удаляться из истории");
-
+        taskManager.addTask(subtask);
         taskManager.getSubtaskById(subtask.getId());
         taskManager.deleteAllSubtasks();
         Assertions.assertEquals(0, taskManager.getHistory().size(), "При удалении всех подзадач они должны удаляться из истории");
@@ -80,9 +83,9 @@ class InMemoryHistoryManagerTest {
     public void newTaskShouldBeAddedToTheEndOfHistory() {
         Epic epic = new Epic("test", "test");
         taskManager.addTask(task);
-        taskManager.addEpic(epic);
+        taskManager.addTask(epic);
         Subtask subtask = new Subtask("test", "test", epic.getId(), TaskStatus.NEW, 15, startTime.plusHours(1));
-        taskManager.addSubtask(subtask);
+        taskManager.addTask(subtask);
 
         Assertions.assertEquals(0, taskManager.getHistory().size(), "Первоначально история должна быть пустой");
         taskManager.getTaskById(task.getId());

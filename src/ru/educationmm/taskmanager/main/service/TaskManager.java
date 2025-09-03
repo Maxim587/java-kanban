@@ -5,7 +5,6 @@ import ru.educationmm.taskmanager.main.model.Subtask;
 import ru.educationmm.taskmanager.main.model.Task;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface TaskManager {
     List<Task> getTasks();
@@ -14,11 +13,11 @@ public interface TaskManager {
 
     List<Subtask> getSubtasks();
 
-    void addTask(Task task);
+    Task addTask(Task task);
 
-    void addEpic(Epic epic);
+    Epic addTask(Epic epic);
 
-    void addSubtask(Subtask subtask);
+    Subtask addTask(Subtask subtask);
 
     void deleteAllTasks();
 
@@ -26,17 +25,17 @@ public interface TaskManager {
 
     void deleteAllSubtasks();
 
-    Optional<Task> getTaskById(int taskId);
+    Task getTaskById(int taskId);
 
-    Optional<Epic> getEpicById(int epicId);
+    Epic getEpicById(int epicId);
 
-    Optional<Subtask> getSubtaskById(int subtaskId);
+    Subtask getSubtaskById(int subtaskId);
 
     void updateTask(Task task);
 
-    void updateEpic(Epic epic);
+    void updateTask(Epic epic);
 
-    void updateSubtask(Subtask subtask);
+    void updateTask(Subtask subtask);
 
     void deleteTaskById(int taskId);
 
@@ -48,11 +47,5 @@ public interface TaskManager {
 
     List<Task> getHistory();
 
-    //void addToPrioritizedSet(Task task);
-
-    //List<Task> getPrioritizedTasks();
-
-    //boolean isIntersectingTasks(Task task1, Task task2);
-
-    //boolean checkExistingIntersections(Task task);
+    List<Task> getPrioritizedTasks();
 }
